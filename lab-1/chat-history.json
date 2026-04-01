@@ -5,7 +5,7 @@
     "agent": "GitHub Copilot",
     "startDate": "2026-03-24",
     "endDate": "2026-04-01",
-    "totalMessages": 30,
+    "totalMessages": 34,
     "language": "Croatian"
   },
   "conversations": [
@@ -189,6 +189,45 @@
       "timestamp": "2026-04-01T09:05:00",
       "role": "assistant",
       "content": "Kreiram lab-1/ folder sa: AGENT-LOG.md (sažetak razgovora), chat-history.json (JSON s razgovorima), README.md (dokumentacija)",
+      "model": "Claude"
+    },
+    {
+      "id": 29,
+      "timestamp": "2026-04-01T14:00:00",
+      "role": "user",
+      "content": "objasni mi sto se dogada kad kreiramo ova 3 korisnika i spremamo ih u bazu, kakva je to baza i sto postizemo"
+    },
+    {
+      "id": 30,
+      "timestamp": "2026-04-01T14:05:00",
+      "role": "assistant",
+      "content": "Kreiramo in-memory bazu sa 3 korisnika (Marko, Amira, David) sa 4 aktivnosti svaki. Baza je privremena struktura u RAM-u koja simulira prave podatke. Postižemo 1-N relacije, OOP polimorfizam i demo za LINQ upite.",
+      "model": "Claude"
+    },
+    {
+      "id": 31,
+      "timestamp": "2026-04-01T14:30:00",
+      "role": "user",
+      "content": "ta baza onda nestaje/prazni se nakon zavrsetka programa?"
+    },
+    {
+      "id": 32,
+      "timestamp": "2026-04-01T14:35:00",
+      "role": "assistant",
+      "content": "Da! Baza potpuno nestaje jer je samo u RAM memoriji. Nakon što se program završi, proces se gasi i sve je obrisano. Za trajnost trebala bi SQL baza ili JSON fajl.",
+      "model": "Claude"
+    },
+    {
+      "id": 33,
+      "timestamp": "2026-04-01T15:00:00",
+      "role": "user",
+      "content": "LINQ upiti su nesto poput lambda u javi?"
+    },
+    {
+      "id": 34,
+      "timestamp": "2026-04-01T15:05:00",
+      "role": "assistant",
+      "content": "Da! LINQ je kao Stream API sa lambdama. Java koristi .stream().filter().map().collect(), a C# koristi direktno .Where().Select().ToList(). LINQ je Streams API na steroidima sa 75+ metoda.",
       "model": "Claude"
     }
   ]

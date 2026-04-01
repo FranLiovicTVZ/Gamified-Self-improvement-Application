@@ -77,6 +77,38 @@
 - **Odgovor:** Kreiraj lab-1/ folder sa: AGENT-LOG.md, chat-history.json, README.md
 - **Rezultat:** Fleksibilna struktura za sve laboratorijske vježbe
 
+### 14. **In-Memory GameDatabase Objašnjenje**
+- **Tema:** Što se dogada kad kreiramo 3 korisnika i spremamo ih u bazu?
+- **Detaljno objašnjenje:**
+  - GameDatabase je inicijalizirana sa 3 duhovne knjige (Biblija, Kuran, Tora)
+  - GameDatabase je inicijalizirana sa 4 XP nagrade (Početni trening, Dnevna meditacija, itd)
+  - 3 korisnika kreirani: Marko92, AminaX, DavidT
+  - Svaki korisnik ima 4 aktivnosti (Exercise, SpiritualActivity, Meditation, DailyJournal)
+  - Baza je 1-N relacijska: User → Activities, User → Journals
+  - Sve je u RAM memoriji (in-memory)
+- **Rezultat:** Korisnik razumije arhitekturu podataka i 1-N relacije
+
+### 15. **In-Memory Baza - Trajnost Podataka**
+- **Tema:** Nestaje li baza nakon završetka programa?
+- **Objašnjenje:**
+  - DA! Baza potpuno nestaje jer je samo u RAM-u
+  - Kada se dotnet run završi, proces se gasi
+  - RAM se oslobađa i svi podaci su izbrisani
+  - Za trajnost trebala bi: SQL Server, SQLite, ili JSON fajl
+  - Ovo je OK za Lab 1 jer trebam samo test podatke
+- **Rezultat:** Korisnik razumije razliku između in-memory i persistent baza
+
+### 16. **LINQ vs Java Stream API - Lambda Koncepta**
+- **Tema:** Jesu li LINQ upiti kao lambda u Javi?
+- **Detaljno objašnjenje:**
+  - DA! LINQ koristi lambda expressions kao Java Stream API
+  - Java: `.stream().filter(u -> u.getTotalXP() > 1000).collect()`
+  - C#: `.Where(u => u.TotalXP > 1000).ToList()`
+  - Lambda Python u LINQ: `u => u.TotalXP` (parametar → expression)
+  - LINQ ima 75+ metoda (vs Java Stream 30+)
+  - LINQ je direktno na kolekciji (bez `.stream()`)
+- **Rezultat:** Korisnik razumije ekvivalentnost i razlike između Java Stream i C# LINQ
+
 ---
 
 ## 🎯 Ključni Koncepti Naučeni
@@ -152,9 +184,14 @@
 ## 💡 Zaključak
 
 Razgovori s AI agentom su bili vođeni u svrhu:
-1. **Pojašnjenja koncepta** - async/await, LINQ, objektni model
-2. **Rješavanja problema** - CS9035 greška, build issues
-3. **Arhitekturnih odluka** - struktura Lab-1, future labs
-4. **Validacije implementacije** - da li je kod ispravan
+1. **Pojašnjenja koncepta** - async/await, LINQ, objektni model, in-memory baze, Stream API
+2. **Rješavanja problema** - CS9035 greška, CS0246 ChatMessage, build issues, ChatHistoryManager cleanup
+3. **Arhitekturnih odluka** - struktura Lab-1, future labs (lab-2, lab-3), relacijske baze
+4. **Validacije implementacije** - da li je kod ispravan, GitHub push
+5. **Detaljne edukacije** - razlika Java Stream vs C# LINQ, lambda expressions, in-memory vs persistent storage
 
-Svaki razgovor je direktno uticao na finalnu verziju koda i razumijevanje C# koncepta.
+Svaki razgovor je direktno uticao na finalnu verziju koda i duboko razumijevanje C# koncepta compared to Java.
+
+**Ukupno razgovora**: 34 poruke (17 user + 17 agent)  
+**Vremenska raspona**: 24.3.2026 - 1.4.2026 (8 dana)  
+**Rezultat**: Kompletan Lab-1 sa svim zahtjevima + dokumentacijom
