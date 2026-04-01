@@ -1,15 +1,6 @@
 ﻿using GamefiedSelfImprovement;
 using System.Linq;
 
-// Inicijalizuj chat history manager za Lab-1 AI razgovore
-var chatHistory = new ChatHistoryManager();
-
-// HOOKS - Event listeneri
-chatHistory.OnMessageAdded += (message) =>
-{
-    Console.WriteLine($"✓ Nova poruka dodana: [{message.Role}]");
-};
-
 // ========== KREIRAJ BAZU PODATAKA ==========
 Console.WriteLine("╔════════════════════════════════════════════════════╗");
 Console.WriteLine("║   GAMIFIED SELF IMPROVEMENT - LAB 1 DEMO          ║");
@@ -281,18 +272,6 @@ Console.WriteLine("╚═══════════════════�
 // ASYNC DEMO - simuliraj meditaciju
 await SimulateMeditationAsync();
 
-Console.WriteLine("\n╔════════════════════════════════════════════════════╗");
-Console.WriteLine("║                  CHAT HISTORY MANAGER            ║");
-Console.WriteLine("╚════════════════════════════════════════════════════╝\n");
-
-// Dodaj Lab-1 AI razgovore u chat history
-chatHistory.AddMessage("user", "Trebam krirati objektni model za Gamified Self Improvement projekt");
-chatHistory.AddMessage("assistant", "Odličan projekt! Trebaju ti najmanje 7 klasa s 1-N relacijama. Preporuka: User > Activities", "Claude");
-
-chatHistory.AddMessage("user", "Koja svojstva trebam dodati u User klasu?");
-chatHistory.AddMessage("assistant", "Id, Username, Email, TotalXP, Level, CreatedDate, Activities (List), LastActiveDate - minimum 8 svojstava", "Claude");
-
-PrintMenu(chatHistory);
 
 // ========== ASYNC METODA ==========
 static async Task SimulateMeditationAsync()
@@ -327,65 +306,3 @@ static async Task SimulateMeditationAsync()
     Console.WriteLine($"   Jasnoća uma: {meditation.MentalClarity}/10\n");
 }
 
-// ========== MENI CHAT HISTORY ==========
-static void PrintMenu(ChatHistoryManager history)
-{
-    while (true)
-    {
-        Console.WriteLine("\n╔════════════════════════════════════════════════════╗");
-        Console.WriteLine("║              CHAT HISTORY OPTIONS                 ║");
-        Console.WriteLine("╚════════════════════════════════════════════════════╝");
-        Console.WriteLine("1. 📝 Pogledaj istoriju");
-        Console.WriteLine("2. 💾 Exportuj kao JSON");
-        Console.WriteLine("3. 📄 Exportuj kao TXT");
-        Console.WriteLine("4. ➕ Dodaj novu poruku");
-        Console.WriteLine("5. 🗑️  Obriši istoriju");
-        Console.WriteLine("0. 🚪 Izlaz");
-        Console.Write("\nOdaberi opciju: ");
-
-        if (int.TryParse(Console.ReadLine(), out int choice))
-        {
-            switch (choice)
-            {
-                case 1:
-                    Console.WriteLine("\n" + history.ExportAsText());
-                    break;
-                case 2:
-                    var jsonPath = Path.Combine(
-                        Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                        $"lab1_chat_history_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.json"
-                    );
-                    history.ExportToFile(jsonPath, ExportFormat.Json);
-                    break;
-                case 3:
-                    var txtPath = Path.Combine(
-                        Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                        $"lab1_chat_history_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt"
-                    );
-                    history.ExportToFile(txtPath, ExportFormat.Text);
-                    break;
-                case 4:
-                    Console.Write("Tvoja poruka: ");
-                    var userMsg = Console.ReadLine() ?? "";
-                    if (!string.IsNullOrEmpty(userMsg))
-                    {
-                        history.AddMessage("user", userMsg);
-                        Console.Write("Odgovor AI-a: ");
-                        var aiMsg = Console.ReadLine() ?? "";
-                        if (!string.IsNullOrEmpty(aiMsg))
-                            history.AddMessage("assistant", aiMsg, "Claude");
-                    }
-                    break;
-                case 5:
-                    history.ClearHistory();
-                    break;
-                case 0:
-                    Console.WriteLine("\n✓ Hvala na korištenju! 👋");
-                    return;
-                default:
-                    Console.WriteLine("❌ Nepoznata opcija");
-                    break;
-            }
-        }
-    }
-}
