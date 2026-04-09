@@ -1,0 +1,1187 @@
+/* ============================================
+   Gamified Self Improvement - Enhanced CSS
+   Non-standard Bootstrap Design with Gamification
+   ============================================ */
+
+:root {
+    /* Color Palette - Spiritual Minimalism */
+    --primary: #1a1a3f;           /* Deep Navy/Purple - Spirituality */
+    --primary-light: #2d2d5f;     /* Lighter primary for accents */
+    --primary-dark: #0f0f1f;      /* Darker primary */
+    --secondary: #663399;         /* Purple - Secondary depth */
+    --accent: #f4b860;            /* Gold - Progress, Energy */
+    --accent-light: #fcc984;      /* Light Gold */
+    --success: #4ecdc4;           /* Mint Green - Wellness, Growth */
+    --success-light: #7ae5dd;     /* Light Mint */
+    
+    /* Neutrals */
+    --neutral-bg: #f8f9fa;        /* Off-white background */
+    --neutral-light: #f5f5f7;     /* Light gray */
+    --neutral-med: #e0e0e6;       /* Medium gray */
+    --neutral-dark: #b0b0b8;      /* Dark gray */
+    
+    /* Text */
+    --text-primary: #1a1a2e;      /* Very dark for readability */
+    --text-secondary: #4a4a6a;    /* Medium gray-purple */
+    --text-light: #7a7a8e;        /* Light text */
+    
+    /* Activity Type Colors */
+    --activity-exercise: #ff6b6b; /* Exercise - Red energy */
+    --activity-meditation: #9b59b6; /* Meditation - Purple calm */
+    --activity-spiritual: #3498db; /* Spiritual - Blue wisdom */
+    
+    /* Shadows */
+    --shadow-sm: 0 2px 4px rgba(26, 26, 63, 0.08);
+    --shadow-md: 0 4px 12px rgba(26, 26, 63, 0.12);
+    --shadow-lg: 0 8px 24px rgba(26, 26, 63, 0.15);
+    --shadow-xl: 0 12px 32px rgba(26, 26, 63, 0.18);
+    
+    /* Transitions */
+    --transition-fast: 0.2s ease;
+    --transition-base: 0.3s ease;
+    --transition-slow: 0.5s ease;
+}
+
+/* ============================================
+   GLOBAL STYLES & RESET
+   ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(135deg, var(--neutral-bg) 0%, #f0f2f5 100%);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+    padding: 2rem 1rem;
+}
+
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--primary);
+    letter-spacing: -0.5px;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+}
+
+h2 {
+    font-size: 1.875rem;
+    margin-bottom: 1.25rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+h4 {
+    font-size: 1.25rem;
+}
+
+p {
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+}
+
+a {
+    color: var(--primary);
+    text-decoration: none;
+    transition: color var(--transition-base);
+    position: relative;
+}
+
+a:hover {
+    color: var(--secondary);
+}
+
+/* ============================================
+   BUTTONS - Custom Gamified Styling
+   ============================================ */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    margin: 0.5rem;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all var(--transition-base);
+    text-decoration: none;
+    user-select: none;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+/* Primary Button */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white;
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Secondary Button */
+.btn-secondary {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+    color: white;
+    box-shadow: var(--shadow-md);
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #f39c12 0%, var(--accent) 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Success Button */
+.btn-success {
+    background: linear-gradient(135deg, var(--success) 0%, var(--success-light) 100%);
+    color: white;
+    box-shadow: var(--shadow-md);
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Ghost Button */
+.btn-ghost {
+    background: transparent;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+}
+
+.btn-ghost:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-details {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    background: var(--primary);
+    color: white;
+    border-radius: 8px;
+    transition: all var(--transition-base);
+    display: inline-block;
+}
+
+.btn-details:hover {
+    background: var(--secondary);
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   NAVBAR - Custom Design
+   ============================================ */
+
+.navbar {
+    background: var(--primary);
+    border-bottom: 3px solid var(--accent);
+    padding: 1rem 0;
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all var(--transition-base);
+}
+
+.navbar-brand:hover {
+    color: var(--accent) !important;
+    transform: scale(1.05);
+}
+
+.nav-link {
+    color: rgba(255, 255, 255, 0.8) !important;
+    margin: 0 0.5rem;
+    font-weight: 600;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--success));
+    transition: width var(--transition-base);
+}
+
+.nav-link:hover {
+    color: white !important;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+footer {
+    background: var(--primary);
+    border-top: 3px solid var(--accent);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 2rem 0;
+    text-align: center;
+    margin-top: auto;
+}
+
+/* ============================================
+   CARDS - Base Component
+   ============================================ */
+
+.card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    position: relative;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--transition-base);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+}
+
+.card:hover::before {
+    transform: scaleX(1);
+}
+
+/* ============================================
+   XP BAR - Gamification Element
+   ============================================ */
+
+.xp-bar-container {
+    margin: 1rem 0;
+    background: var(--neutral-light);
+    border-radius: 20px;
+    height: 28px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
+    position: relative;
+}
+
+.xp-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--success));
+    border-radius: 20px;
+    transition: width var(--transition-slow);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 0.75rem;
+}
+
+.xp-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    animation: shimmer 2s infinite;
+    border-radius: 20px;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.xp-text {
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+/* ============================================
+   LEVEL BADGE - Gamification Element
+   ============================================ */
+
+.level-badge, .xp-badge, .activity-type-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: var(--shadow-sm);
+    gap: 0.4rem;
+}
+
+.level-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent-light));
+    color: white;
+}
+
+.xp-badge {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: white;
+}
+
+/* Activity Type Badges */
+.activity-type-badge {
+    background: white;
+    border: 2px solid var(--success);
+    color: var(--success);
+    font-weight: 600;
+}
+
+.activity-type-badge.exercise {
+    border-color: var(--activity-exercise);
+    color: var(--activity-exercise);
+}
+
+.activity-type-badge.meditation {
+    border-color: var(--activity-meditation);
+    color: var(--activity-meditation);
+}
+
+.activity-type-badge.spiritual {
+    border-color: var(--activity-spiritual);
+    color: var(--activity-spiritual);
+}
+
+/* ============================================
+   DASHBOARD LAYOUT
+   ============================================ */
+
+.dashboard-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    text-align: center;
+    transition: all var(--transition-base);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--accent), var(--success));
+}
+
+.stat-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-card.highlight {
+    background: linear-gradient(135deg, rgba(78, 205, 196, 0.08) 0%, rgba(244, 184, 96, 0.08) 100%);
+    border: 2px solid var(--success);
+}
+
+.stat-card h3 {
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-light);
+    margin-bottom: 0.75rem;
+}
+
+.stat-number {
+    font-size: 2.75rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0.5rem 0;
+}
+
+.stat-xp, .stat-name {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0.3rem 0;
+}
+
+/* ============================================
+   GRID LAYOUTS
+   ============================================ */
+
+.users-grid, .activities-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.activities-list {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+}
+
+/* ============================================
+   USER CARDS - Enhanced Gamification
+   ============================================ */
+
+.user-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    position: relative;
+    overflow: hidden;
+}
+
+.user-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(244, 184, 96, 0.1), transparent);
+    pointer-events: none;
+}
+
+.user-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+}
+
+.user-card h3 {
+    font-size: 1.4rem;
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+}
+
+.user-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.user-bio {
+    color: var(--text-light);
+    margin-bottom: 1rem;
+    font-style: italic;
+    padding: 0.75rem;
+    border-left: 4px solid var(--accent);
+    background: var(--neutral-light);
+    border-radius: 8px;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+}
+
+.user-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+    padding: 1rem 0;
+    border-top: 1px solid var(--neutral-med);
+    border-bottom: 1px solid var(--neutral-med);
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-light);
+    letter-spacing: 0.5px;
+    margin-bottom: 0.3rem;
+}
+
+.stat span {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.user-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.user-actions .btn {
+    flex: 1;
+    min-width: 120px;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+}
+
+/* ============================================
+   ACTIVITY CARDS - Type-Specific Styling
+   ============================================ */
+
+.activity-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.activity-card.exercise {
+    border-left: 6px solid var(--activity-exercise);
+}
+
+.activity-card.meditation {
+    border-left: 6px solid var(--activity-meditation);
+}
+
+.activity-card.spiritual {
+    border-left: 6px solid var(--activity-spiritual);
+}
+
+.activity-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.activity-header h3 {
+    margin-bottom: 0;
+    flex: 1;
+}
+
+.activity-content {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: var(--neutral-light);
+    border-radius: 12px;
+}
+
+.activity-content p {
+    margin-bottom: 0.5rem;
+}
+
+.activity-content strong {
+    color: var(--primary);
+}
+
+/* ============================================
+   SECTION CONTAINERS
+   ============================================ */
+
+.recent-section, .users-section, .activities-page, .users-page {
+    margin-bottom: 3rem;
+}
+
+.recent-section h2, .users-section h2 {
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 4px solid var(--accent);
+    display: inline-block;
+}
+
+.activity-list, .journal-list {
+    list-style: none;
+    padding: 0;
+}
+
+.activity-item, .journal-item {
+    background: white;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    border-radius: 12px;
+    border-left: 5px solid var(--accent);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-sm);
+}
+
+.activity-item:hover, .journal-item:hover {
+    transform: translateX(4px);
+    box-shadow: var(--shadow-md);
+}
+
+.activity-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.activity-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.activity-type {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.activity-xp, .activity-date, .journal-date {
+    background: linear-gradient(135deg, var(--accent), var(--success));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* ============================================
+   BREADCRUMB
+   ============================================ */
+
+.breadcrumb {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1.25rem;
+    background: white;
+    border-radius: 50px;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    font-weight: 600;
+    transition: all var(--transition-base);
+    gap: 0.5rem;
+}
+
+.breadcrumb:hover {
+    transform: translateX(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+/* ============================================
+   PAGE HEADERS & SECTIONS
+   ============================================ */
+
+.page-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+.no-data {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    text-align: center;
+    color: var(--text-light);
+    box-shadow: var(--shadow-md);
+    border-left: 4px solid var(--neutral-med);
+}
+
+/* ============================================
+   PROFILE LAYOUT
+   ============================================ */
+
+.user-details-page, .activity-details-page {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.user-header-section, .activity-header {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-md);
+    border-top: 6px solid var(--accent);
+}
+
+.user-badges {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.profile-grid, .details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.profile-section, .details-section {
+    background: white;
+    padding: 1.75rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.profile-section h3, .details-section h3 {
+    font-size: 1.35rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 3px solid var(--accent);
+}
+
+.info-list {
+    list-style: none;
+    padding: 0;
+}
+
+.info-list li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--neutral-light);
+    color: var(--text-secondary);
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.info-list li strong {
+    color: var(--primary);
+    flex-shrink: 0;
+}
+
+.info-list li:last-child {
+    border-bottom: none;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    h3 {
+        font-size: 1.25rem;
+    }
+
+    main {
+        padding: 1rem 0.5rem;
+    }
+
+    .dashboard-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .users-grid, .activities-list {
+        grid-template-columns: 1fr;
+    }
+
+    .user-stats {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .profile-grid, .details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .user-header, .activity-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .btn {
+        padding: 0.65rem 1.25rem;
+        font-size: 0.95rem;
+    }
+
+    .stat-number {
+        font-size: 2.25rem;
+    }
+
+    .navbar-brand {
+        font-size: 1.25rem;
+    }
+
+    .card {
+        padding: 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    html {
+        font-size: 14px;
+    }
+
+    h1 {
+        font-size: 1.75rem;
+    }
+
+    h2 {
+        font-size: 1.25rem;
+    }
+
+    h3 {
+        font-size: 1rem;
+    }
+
+    main {
+        padding: 0.75rem 0.5rem;
+    }
+
+    .stat-number {
+        font-size: 1.75rem;
+    }
+
+    .user-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+
+    .user-actions .btn {
+        padding: 0.55rem 0.75rem;
+        font-size: 0.8rem;
+        margin: 0.25rem;
+    }
+
+    .level-badge, .xp-badge, .activity-type-badge {
+        padding: 0.35rem 0.7rem;
+        font-size: 0.75rem;
+    }
+
+    .card {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .info-list li {
+        flex-direction: column;
+        padding: 0.5rem 0;
+    }
+}
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--neutral-dark);
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-bottom: 0.3rem;
+}
+
+.stat span {
+    display: block;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.user-actions, .activity-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* ============================================
+   LISTS
+   ============================================ */
+
+.activity-list, .journal-list {
+    list-style: none;
+    margin-bottom: 1.5rem;
+}
+
+.activity-item, .journal-item {
+    background: var(--neutral-light);
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    border-radius: 8px;
+    border-left: 3px solid var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.activity-item:hover, .journal-item:hover {
+    background-color: #f0f0f0;
+}
+
+.activity-icon {
+    font-size: 1.5rem;
+}
+
+.activity-info {
+    flex-grow: 1;
+}
+
+.activity-type {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+.activity-xp, .activity-date {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.journal-date {
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+.journal-item p {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-top: 0.5rem;
+}
+
+/* ============================================
+   BREADCRUMBS
+   ============================================ */
+
+.breadcrumb {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--neutral-light);
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+/* ============================================
+   PAGE STYLING
+   ============================================ */
+
+.page-subtitle {
+    color: var(--text-light);
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
+.no-data {
+    text-align: center;
+    color: var(--text-light);
+    padding: 2rem;
+    background: var(--neutral-light);
+    border-radius: 8px;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .user-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .activity-item, .journal-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .users-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card h3 {
+        font-size: 1.1rem;
+    }
+}
+
+/* ============================================
+   JOURNAL STYLES - For DailyJournal Display
+   ============================================ */
+
+.journal-header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.75rem;
+}
+
+.journal-header strong {
+    color: var(--primary);
+    font-size: 1.1rem;
+    margin-bottom: 0.3rem;
+}
+
+.journal-date {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.journal-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+    padding: 0.75rem 0;
+    border-top: 1px solid var(--neutral-dark);
+    border-bottom: 1px solid var(--neutral-dark);
+}
+
+.mood-stat, .energy-stat {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    word-break: break-word;
+    flex-shrink: 0;
+}
+
+.journal-reflection {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    font-style: italic;
+    margin: 0.5rem 0 0 0;
+    line-height: 1.5;
+    word-break: break-word;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+@media (max-width: 768px) {
+    .journal-stats {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .mood-stat, .energy-stat {
+        font-size: 0.85rem;
+    }
+}

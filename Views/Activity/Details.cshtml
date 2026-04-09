@@ -1,0 +1,197 @@
+@model GamefiedSelfImprovement.Activity
+
+@{
+    ViewData["Title"] = $"Aktivnost - {Model.Title}";
+    var userName = ViewBag.UserName;
+}
+
+<div class="activity-details-page">
+    <a href="@Url.Action("Index", "Activity", new { userId = Model.UserId })" class="breadcrumb">← Nazad na aktivnosti</a>
+
+    @{
+        var activityClass = Model.ActivityType == GamefiedSelfImprovement.ActivityType.Exercise ? "exercise" 
+            : Model.ActivityType == GamefiedSelfImprovement.ActivityType.Meditation ? "meditation" : "spiritual";
+        var activityEmoji = Model.ActivityType == GamefiedSelfImprovement.ActivityType.Exercise ? "💪" 
+            : Model.ActivityType == GamefiedSelfImprovement.ActivityType.Meditation ? "🧘" : "📖";
+        var borderColor = Model.ActivityType == GamefiedSelfImprovement.ActivityType.Exercise ? "var(--activity-exercise)"
+            : Model.ActivityType == GamefiedSelfImprovement.ActivityType.Meditation ? "var(--activity-meditation)" : "var(--activity-spiritual)";
+        var badgeColor = Model.ActivityType == GamefiedSelfImprovement.ActivityType.Exercise ? "exercise"
+            : Model.ActivityType == GamefiedSelfImprovement.ActivityType.Meditation ? "meditation" : "spiritual";
+    }
+
+    <!-- Activity Header -->
+    <div class="activity-header" style="border-top-color: @borderColor;">
+        <div style="display: flex; align-items: flex-start; gap: 1rem;">
+            <span style="font-size: 3rem;">@activityEmoji</span>
+            <div>
+                <h1 style="margin: 0 0 0.5rem 0;">@Model.Title</h1>
+                <span class="activity-type-badge @badgeColor">@Model.ActivityType</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Details Grid -->
+    <div class="details-grid">
+        <!-- Basic Information -->
+        <div class="details-section">
+            <h3>📋 Osnovne Informacije</h3>
+            <ul class="info-list">
+                <li>
+                    <strong>Tip aktivnosti:</strong>
+                    <span>@Model.ActivityType</span>
+                </li>
+                <li>
+                    <strong>Korisnik:</strong>
+                    <a asp-controller="User" asp-action="Details" asp-route-id="@Model.UserId" style="font-weight: 600;">
+                        @(string.IsNullOrEmpty(userName) ? $"ID: {Model.UserId}" : userName)
+                    </a>
+                </li>
+                <li>
+                    <strong>Datum:</strong>
+                    <span>@Model.CompletedDate.ToString("dddd, dd. MMMM yyyy. HH:mm")</span>
+                </li>
+                <li>
+                    <strong>XP Nagrađeno:</strong>
+                    <span style="font-size: 1.1rem; font-weight: 700; color: var(--accent);">+@Model.CalculateXP() XP</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Exercise-Specific Details -->
+        @if (Model.ActivityType == GamefiedSelfImprovement.ActivityType.Exercise)
+        {
+            @if (Model is GamefiedSelfImprovement.Exercise exercise)
+            {
+                <div class="details-section" style="border-top-color: var(--activity-exercise);">
+                    <h3>💪 Vježba - DetalJi</h3>
+                    <ul class="info-list">
+                        <li>
+                            <strong>Tip vježbe:</strong>
+                            <span>@exercise.ExerciseType</span>
+                        </li>
+                        <li>
+                            <strong>Trajanje:</strong>
+                            <span>@exercise.DurationMinutes minuta</span>
+                        </li>
+                        <li>
+                            <strong>Setovi × Ponavljanja:</strong>
+                            <span>@exercise.Sets × @exercise.Reps</span>
+                        </li>
+                        <li>
+                            <strong>Težina:</strong>
+                            <span>@exercise.Weight kg</span>
+                        </li>
+                        <li>
+                            <strong>Kalorije spaljena:</strong>
+                            <span style="color: var(--activity-exercise); font-weight: 600;">@exercise.CaloriesBurned</span>
+                        </li>
+                        <li>
+                            <strong>Lokacija:</strong>
+                            <span>@exercise.Location</span>
+                        </li>
+                        <li>
+                            <strong>Težina vježbe:</strong>
+                            <span>@exercise.Difficulty</span>
+                        </li>
+                        <li>
+                            <strong>Mišićne grupe:</strong>
+                            <span>@string.Join(", ", exercise.MuscleGroups)</span>
+                        </li>
+                    </ul>
+                </div>
+            }
+        }
+
+        <!-- Meditation-Specific Details -->
+        @if (Model.ActivityType == GamefiedSelfImprovement.ActivityType.Meditation)
+        {
+            @if (Model is GamefiedSelfImprovement.Meditation meditation)
+            {
+                <div class="details-section" style="border-top-color: var(--activity-meditation);">
+                    <h3>🧘 Meditacija - Detaljи</h3>
+                    <ul class="info-list">
+                        <li>
+                            <strong>Tip meditacije:</strong>
+                            <span>@meditation.MeditationType</span>
+                        </li>
+                        <li>
+                            <strong>Trajanje:</strong>
+                            <span>@meditation.DurationMinutes minuta</span>
+                        </li>
+                        <li>
+                            <strong>Fokus:</strong>
+                            <span>@meditation.FocusArea</span>
+                        </li>
+                        <li>
+                            <strong>Smanjenje stresa:</strong>
+                            <span>@meditation.StressReliefScore / 10</span>
+                        </li>
+                        <li>
+                            <strong>Mentalna jasnoća:</strong>
+                            <span>@meditation.MentalClarity / 10</span>
+                        </li>
+                        <li>
+                            <strong>Težina:</strong>
+                            <span>@meditation.Difficulty</span>
+                        </li>
+                        @if (!string.IsNullOrEmpty(meditation.Notes))
+                        {
+                            <li>
+                                <strong>Napomene:</strong>
+                                <span>@meditation.Notes</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+        }
+
+        <!-- Spiritual Activity-Specific Details -->
+        @if (Model.ActivityType == GamefiedSelfImprovement.ActivityType.Spiritual)
+        {
+            @if (Model is GamefiedSelfImprovement.SpiritualActivity spiritual)
+            {
+                <div class="details-section" style="border-top-color: var(--activity-spiritual);">
+                    <h3>📖 Duhovka Aktivnost - Detaljи</h3>
+                    <ul class="info-list">
+                        <li>
+                            <strong>Knjiga ID:</strong>
+                            <span>@spiritual.BookId</span>
+                        </li>
+                        <li>
+                            <strong>Trenutna stranica:</strong>
+                            <span>@spiritual.CurrentPage</span>
+                        </li>
+                        <li>
+                            <strong>Brojи pročitanih stranica:</strong>
+                            <span>@spiritual.PagesRead</span>
+                        </li>
+                        <li>
+                            <strong>Trajanje čitanja:</strong>
+                            <span>@spiritual.DurationMinutes minuta</span>
+                        </li>
+                        <li>
+                            <strong>Težina:</strong>
+                            <span>@spiritual.Difficulty</span>
+                        </li>
+                        @if (!string.IsNullOrEmpty(spiritual.Reflection))
+                        {
+                            <li>
+                                <strong>Refleksija:</strong>
+                                <span style="display: block; margin-top: 0.5rem; padding: 0.75rem; background: var(--activity-spiritual); background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(52, 152, 219, 0.05)); border-radius: 8px; border-left: 4px solid var(--activity-spiritual);">
+                                    @spiritual.Reflection
+                                </span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+        }
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons" style="margin-top: 2rem;">
+        <a href="@Url.Action("Index", "Activity", new { userId = Model.UserId })" class="btn btn-secondary">← Sve aktivnosti</a>
+        <a asp-controller="User" asp-action="Details" asp-route-id="@Model.UserId" class="btn btn-primary">Korisnikov profil →</a>
+    </div>
+</div>

@@ -1,0 +1,94 @@
+@model List<GamefiedSelfImprovement.User>
+
+@{
+    ViewData["Title"] = "Korisnici";
+}
+
+<div class="users-page">
+    <div style="margin-bottom: 2rem;">
+        <h1>👥 Korisnici</h1>
+        <p class="page-subtitle">Pogledaj sve registrirane korisnike i njihov napredak</p>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="no-data">
+            <p style="margin: 0;">Nema korinika za prikaz.</p>
+        </div>
+    }
+    else
+    {
+        <div class="users-grid">
+            @foreach (var user in Model.OrderByDescending(u => u.TotalXP))
+            {
+                <div class="user-card">
+                    <div class="user-header">
+                        <div>
+                            <h3 style="margin-bottom: 0.3rem;">@user.Username</h3>
+                            <p style="color: var(--text-light); font-size: 0.85rem; margin: 0;">
+                                @(user.Activities?.Count ?? 0) aktivnosti | 
+                                <span style="color: var(--accent); font-weight: 600;">Član od @user.CreatedDate.ToString("dd.MM.yyyy")</span>
+                            </p>
+                        </div>
+                        <span class="level-badge">⭐ Level @user.Level</span>
+                    </div>
+                    
+                    <!-- User Bio -->
+                    @if (!string.IsNullOrEmpty(user.Bio))
+                    {
+                        <div class="user-bio">@user.Bio</div>
+                    }
+                    else
+                    {
+                        <div class="user-bio" style="color: var(--text-light); font-style: normal;">
+                            Aktivni član koji radi na samonapredovanju
+                        </div>
+                    }
+                    
+                    <!-- User Statistics -->
+                    <div class="user-stats">
+                        <div class="stat">
+                            <label>⚡ XP</label>
+                            <span>@user.TotalXP</span>
+                        </div>
+                        <div class="stat">
+                            <label>📧 Email</label>
+                            <span style="font-size: 0.85rem; word-break: break-all;">@user.Email</span>
+                        </div>
+                        <div class="stat">
+                            <label>🎯 Nivo</label>
+                            <span>@user.Level</span>
+                        </div>
+                    </div>
+                    
+                    <!-- XP Progress Bar -->
+                    <div style="margin: 1rem 0;">
+                        <div style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                            XP Progress
+                        </div>
+                        <div class="xp-bar-container">
+                            @{
+                                var userXpPercentage = Math.Min((user.TotalXP % 1000) / 10, 100);
+                            }
+                            <div class="xp-bar" style="width: @userXpPercentage%;">
+                                @if (userXpPercentage > 20)
+                                {
+                                    <span class="xp-text">@((int)userXpPercentage)%</span>
+                                }
+                            </div>
+                        </div>
+                        <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 0.3rem; margin-bottom: 0;">
+                            @((user.TotalXP % 1000).ToString()) / 1000 XP do sljedećeg nivoa
+                        </p>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="user-actions">
+                        <a asp-controller="User" asp-action="Details" asp-route-id="@user.Id" class="btn btn-primary">Vidi profil</a>
+                        <a asp-controller="Activity" asp-action="Index" asp-route-userId="@user.Id" class="btn btn-secondary">Aktivnosti</a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

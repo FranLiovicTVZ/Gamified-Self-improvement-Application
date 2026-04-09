@@ -1,0 +1,133 @@
+@model GamefiedSelfImprovement.User
+
+@{
+    ViewData["Title"] = $"Profil - {Model.Username}";
+}
+
+<div class="user-details-page">
+    <a href="@Url.Action("Index", "User")" class="breadcrumb">← Nazad na korisnike</a>
+
+    <!-- Header Section with Profile Info -->
+    <div class="user-header-section">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+            <div>
+                <h1 style="margin-bottom: 0.5rem;">@Model.Username</h1>
+                <p style="color: var(--text-light); font-size: 1rem;">Član od @Model.CreatedDate.ToString("d. MMMM yyyy.")</p>
+            </div>
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                <span class="level-badge">⭐ Level @Model.Level</span>
+                <span class="xp-badge">⚡ @Model.TotalXP XP</span>
+            </div>
+        </div>
+        
+        <!-- XP Progress Bar -->
+        <div style="margin-top: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <h4 style="margin: 0; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light);">Level Progress</h4>
+                <span style="font-weight: 700; color: var(--primary);">@((Model.TotalXP % 1000).ToString("000")) / 1000 XP</span>
+            </div>
+            <div class="xp-bar-container" style="height: 32px;">
+                @{
+                    var userXpPercentage = Math.Min((Model.TotalXP % 1000) / 10, 100);
+                }
+                <div class="xp-bar" style="width: @userXpPercentage%;">
+                    <span class="xp-text" style="font-size: 0.9rem;">@((int)userXpPercentage)%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Grid -->
+    <div class="profile-grid">
+        <!-- Profile Information Section -->
+        <div class="profile-section">
+            <h3>ℹ️ Osnovne Informacije</h3>
+            <ul class="info-list">
+                <li>
+                    <strong>Email:</strong>
+                    <span>@Model.Email</span>
+                </li>
+                <li>
+                    <strong>Nivo:</strong>
+                    <span>@Model.Level</span>
+                </li>
+                <li>
+                    <strong>Ukupno XP:</strong>
+                    <span style="color: var(--accent); font-weight: 700;">@Model.TotalXP</span>
+                </li>
+                <li>
+                    <strong>Preferirani tip meditacije:</strong>
+                    <span>@Model.PreferredMeditationType.ToString()</span>
+                </li>
+                @if (!string.IsNullOrEmpty(Model.Bio))
+                {
+                    <li>
+                        <strong>Bio:</strong>
+                        <span>@Model.Bio</span>
+                    </li>
+                }
+            </ul>
+        </div>
+
+        <!-- Activities Section -->
+        @if (Model.Activities.Any())
+        {
+            <div class="profile-section">
+                <h3>⚡ Nedavne Aktivnosti (@Model.Activities.Count)</h3>
+                <ul class="activity-list">
+                    @foreach (var activity in Model.Activities.OrderByDescending(a => a.CompletedDate).Take(5))
+                    {
+                        var activityClass = activity.ActivityType == GamefiedSelfImprovement.ActivityType.Exercise ? "exercise" 
+                            : activity.ActivityType == GamefiedSelfImprovement.ActivityType.Meditation ? "meditation" : "spiritual";
+                        var activityEmoji = activity.ActivityType == GamefiedSelfImprovement.ActivityType.Exercise ? "💪" 
+                            : activity.ActivityType == GamefiedSelfImprovement.ActivityType.Meditation ? "🧘" : "📖";
+                        
+                        <li class="activity-item">
+                            <span class="activity-icon">@activityEmoji</span>
+                            <div class="activity-info">
+                                <strong>@activity.Title</strong>
+                                <span class="activity-type">@activity.ActivityType</span>
+                            </div>
+                            <span class="activity-xp">+@activity.CalculateXP()</span>
+                        </li>
+                    }
+                </ul>
+                <div style="margin-top: 1rem;">
+                    <a asp-controller="Activity" asp-action="Index" asp-route-userId="@Model.Id" class="btn btn-secondary">Vidi sve aktivnosti</a>
+                </div>
+            </div>
+        }
+
+        <!-- Journals Section -->
+        @if (Model.Journals.Any())
+        {
+            <div class="profile-section">
+                <h3>📓 Dnevnici (@Model.Journals.Count)</h3>
+                <ul class="journal-list">
+                    @foreach (var journal in Model.Journals.OrderByDescending(j => j.JournalDate).Take(5))
+                    {
+                        <li class="journal-item">
+                            <div class="journal-header">
+                                <strong>@journal.Title</strong>
+                                <span class="journal-date">@journal.JournalDate.ToString("dd.MM.yyyy HH:mm")</span>
+                            </div>
+                            <div class="journal-stats">
+                                <span class="mood-stat">😊 Raspoloženje: @journal.Mood/10</span>
+                                <span class="energy-stat">🔋 Energija: @journal.EnergyLevel/10</span>
+                            </div>
+                            @if (!string.IsNullOrEmpty(journal.Reflection))
+                            {
+                                <p class="journal-reflection">@journal.Reflection</p>
+                            }
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+
+    <!-- Back to Users Link -->
+    <div style="margin-top: 2rem;">
+        <a href="@Url.Action("Index", "User")" class="btn btn-primary">← Nazad na sve korisnike</a>
+    </div>
+</div>

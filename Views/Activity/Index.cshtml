@@ -1,0 +1,130 @@
+@model List<GamefiedSelfImprovement.Activity>
+
+@{
+    ViewData["Title"] = "Aktivnosti";
+    var userId = ViewBag.UserId;
+    var userName = ViewBag.UserName;
+}
+
+<div class="activities-page">
+    @if (!string.IsNullOrEmpty(userName))
+    {
+        <a href="@Url.Action("Details", "User", new { id = userId })" class="breadcrumb">← Nazad na @userName</a>
+    }
+    
+    <div style="margin-bottom: 2rem;">
+        <h1>⚡ Aktivnosti @(userName != null ? $"- {userName}" : "")</h1>
+        <p class="page-subtitle">Pregledaj sve aktivnosti i njihove detalje</p>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="no-data">
+            <p style="margin: 0; font-size: 1.1rem;">📭 Nema aktivnosti za prikaz.</p>
+        </div>
+    }
+    else
+    {
+        <!-- Activity Type Filter Stats -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+            @{
+                var exerciseCount = Model.Count(a => a.ActivityType == GamefiedSelfImprovement.ActivityType.Exercise);
+                var meditationCount = Model.Count(a => a.ActivityType == GamefiedSelfImprovement.ActivityType.Meditation);
+                var spiritualCount = Model.Count(a => a.ActivityType == GamefiedSelfImprovement.ActivityType.Spiritual);
+            }
+
+            @if (exerciseCount > 0)
+            {
+                <div class="card" style="border-left: 5px solid var(--activity-exercise);">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span style="font-size: 2rem;">💪</span>
+                        <div>
+                            <p style="margin: 0; font-size: 0.9rem; color: var(--text-light);">Exercise</p>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--activity-exercise);">@exerciseCount</p>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (meditationCount > 0)
+            {
+                <div class="card" style="border-left: 5px solid var(--activity-meditation);">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span style="font-size: 2rem;">🧘</span>
+                        <div>
+                            <p style="margin: 0; font-size: 0.9rem; color: var(--text-light);">Meditation</p>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--activity-meditation);">@meditationCount</p>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (spiritualCount > 0)
+            {
+                <div class="card" style="border-left: 5px solid var(--activity-spiritual);">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span style="font-size: 2rem;">📖</span>
+                        <div>
+                            <p style="margin: 0; font-size: 0.9rem; color: var(--text-light);">Spiritual</p>
+                            <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--activity-spiritual);">@spiritualCount</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Activities List -->
+        <div class="activities-list">
+            @foreach (var activity in Model.OrderByDescending(a => a.CompletedDate))
+            {
+                var activityClass = activity.ActivityType == GamefiedSelfImprovement.ActivityType.Exercise ? "exercise" 
+                    : activity.ActivityType == GamefiedSelfImprovement.ActivityType.Meditation ? "meditation" : "spiritual";
+                var activityEmoji = activity.ActivityType == GamefiedSelfImprovement.ActivityType.Exercise ? "💪" 
+                    : activity.ActivityType == GamefiedSelfImprovement.ActivityType.Meditation ? "🧘" : "📖";
+                var borderColor = activity.ActivityType == GamefiedSelfImprovement.ActivityType.Exercise ? "var(--activity-exercise)"
+                    : activity.ActivityType == GamefiedSelfImprovement.ActivityType.Meditation ? "var(--activity-meditation)" : "var(--activity-spiritual)";
+                var badgeColor = activity.ActivityType == GamefiedSelfImprovement.ActivityType.Exercise ? "exercise"
+                    : activity.ActivityType == GamefiedSelfImprovement.ActivityType.Meditation ? "meditation" : "spiritual";
+
+                <div class="activity-card @activityClass" style="border-left-color: @borderColor;">
+                    <div class="activity-header">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <span style="font-size: 1.5rem;">@activityEmoji</span>
+                                <h3 style="margin: 0;">@activity.Title</h3>
+                            </div>
+                        </div>
+                        <span class="activity-type-badge @badgeColor">@activity.ActivityType</span>
+                    </div>
+                    
+                    <div class="activity-content">
+                        <p><strong>📅 Datum:</strong> @activity.CompletedDate.ToString("dddd, dd. MMMM yyyy.")</p>
+                        
+                        @if (!string.IsNullOrEmpty(userName))
+                        {
+                            <p><strong>👤 Korisnik:</strong> <span style="color: var(--accent); font-weight: 600;">@userName</span></p>
+                        }
+                        else
+                        {
+                            <p>
+                                <strong>👤 Korisnik:</strong> 
+                                <a asp-controller="User" asp-action="Details" asp-route-id="@activity.UserId" style="font-weight: 600;">
+                                    ID: @activity.UserId
+                                </a>
+                            </p>
+                        }
+                        
+                        <div style="padding: 0.75rem; background: var(--neutral-light); border-radius: 8px; margin-top: 0.75rem;">
+                            <p style="margin: 0; display: flex; justify-content: space-between; align-items: center;">
+                                <strong>⭐ XP Nagrađeno:</strong>
+                                <span style="font-size: 1.2rem; font-weight: 700; color: var(--accent);">+@activity.CalculateXP() XP</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <a asp-controller="Activity" asp-action="Details" asp-route-id="@activity.Id" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Vidi Detalje</a>
+                </div>
+            }
+        </div>
+    }
+</div>

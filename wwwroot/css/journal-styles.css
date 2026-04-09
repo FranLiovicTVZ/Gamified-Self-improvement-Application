@@ -1,0 +1,72 @@
+/* ============================================
+   JOURNAL STYLES - For DailyJournal Display
+   ============================================ */
+
+.journal-item {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+}
+
+.journal-header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.75rem;
+    width: 100%;
+}
+
+.journal-header strong {
+    color: var(--primary);
+    font-size: 1.1rem;
+    margin-bottom: 0.3rem;
+}
+
+.journal-date {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.journal-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+    padding: 0.75rem 0;
+    border-top: 1px solid var(--neutral-dark);
+    border-bottom: 1px solid var(--neutral-dark);
+    width: 100%;
+}
+
+.mood-stat, .energy-stat {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    word-break: break-word;
+    flex-shrink: 0;
+}
+
+.journal-reflection {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    font-style: italic;
+    margin: 0.75rem 0 0 0;
+    padding: 0;
+    line-height: 1.5;
+    word-break: break-word;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .journal-stats {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .mood-stat, .energy-stat {
+        font-size: 0.85rem;
+    }
+}
