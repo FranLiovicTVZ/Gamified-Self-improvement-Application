@@ -211,6 +211,25 @@ a:hover {
     transform: translateY(-2px);
 }
 
+/* Profile View Button - Warm Gold */
+.btn-profile {
+    background: #f4b860;
+    color: white;
+    border: 2px solid #2c2c2c;
+    padding: 12px 24px !important;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(244, 184, 96, 0.25);
+}
+
+.btn-profile:hover {
+    background: #f0a847;
+    transform: scale(1.05);
+    box-shadow: 0 4px 16px rgba(244, 184, 96, 0.35);
+    border-color: #2c2c2c;
+}
+
 /* ============================================
    NAVBAR - Custom Design
    ============================================ */
