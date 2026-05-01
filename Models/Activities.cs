@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace GamefiedSelfImprovement;
@@ -9,6 +11,7 @@ namespace GamefiedSelfImprovement;
 /// </summary>
 public class SpiritualBook
 {
+    [Key]
     [JsonPropertyName("id")]
     public int Id { get; set; }
 
@@ -54,11 +57,15 @@ public class SpiritualBook
 /// </summary>
 public abstract class Activity
 {
+    [Key]
     [JsonPropertyName("id")]
     public int Id { get; set; }
 
+    [ForeignKey("User")]
     [JsonPropertyName("userId")]
     public int UserId { get; set; }
+
+    public virtual User? User { get; set; }
 
     [JsonPropertyName("title")]
     public string Title { get; set; } = string.Empty;

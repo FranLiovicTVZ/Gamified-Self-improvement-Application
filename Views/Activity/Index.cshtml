@@ -9,7 +9,7 @@
 <div class="activities-page">
     @if (!string.IsNullOrEmpty(userName))
     {
-        <a href="@Url.Action("Details", "User", new { id = userId })" class="breadcrumb">← Nazad na @userName</a>
+        <a href="@Url.Action("Details", "User", new { id = userId })" class="btn-profile">← Nazad na @userName</a>
     }
     
     <div style="margin-bottom: 2rem;">

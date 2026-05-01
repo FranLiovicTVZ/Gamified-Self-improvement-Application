@@ -1,14 +1,19 @@
 using Gamified_Self_Improvement.Repositories;
+using GamefiedSelfImprovement;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gamified_Self_Improvement.Controllers;
 
+/// <summary>
+/// Controller za upravljanje aktivnostima - custom routing primjena
+/// </summary>
+[Route("aktivnosti")]
 public class ActivityController : Controller
 {
-    private readonly ActivityMockRepository _activityRepository;
-    private readonly UserMockRepository _userRepository;
+    private readonly ActivityRepository _activityRepository;
+    private readonly UserRepository _userRepository;
 
-    public ActivityController(ActivityMockRepository activityRepository, UserMockRepository userRepository)
+    public ActivityController(ActivityRepository activityRepository, UserRepository userRepository)
     {
         _activityRepository = activityRepository;
         _userRepository = userRepository;
@@ -16,7 +21,10 @@ public class ActivityController : Controller
 
     /// <summary>
     /// Lista svih aktivnosti
+    /// URL: /aktivnosti ili /aktivnosti/po-korisniku/{userId}
     /// </summary>
+    [Route("")]
+    [Route("po-korisniku/{userId:int}")]
     public IActionResult Index(int? userId = null)
     {
         var activities = userId.HasValue 
@@ -35,7 +43,9 @@ public class ActivityController : Controller
 
     /// <summary>
     /// Detalji o specifičnoj aktivnosti
+    /// URL: /aktivnosti/{id}
     /// </summary>
+    [Route("{id:int}")]
     public IActionResult Details(int id)
     {
         var activity = _activityRepository.GetById(id);

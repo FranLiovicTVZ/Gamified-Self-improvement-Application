@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text.Json.Serialization;
 
@@ -10,6 +12,7 @@ namespace GamefiedSelfImprovement;
 /// </summary>
 public class XPReward
 {
+    [Key]
     [JsonPropertyName("id")]
     public int Id { get; set; }
 
@@ -48,6 +51,7 @@ public class XPReward
 /// </summary>
 public class TrainingLog
 {
+    [Key]
     [JsonPropertyName("id")]
     public int Id { get; set; }
 

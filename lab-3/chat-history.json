@@ -1,0 +1,195 @@
+{
+  "metadata": {
+    "project": "Gamified Self Improvement - ASP.NET Core MVC",
+    "lab": "Lab 3 - Entity Framework & Routing",
+    "date": "2026-05-01",
+    "student": "Fran Liovic",
+    "aiAgent": "GitHub Copilot (Claude Haiku 4.5)",
+    "duration": "~7 hours",
+    "sessionId": "fe57661a-7291-4517-a03f-3a3d69ea245e",
+    "status": "✅ COMPLETED"
+  },
+  "conversations": [
+    {
+      "turn": 1,
+      "topic": "Initial Setup - Docker & Entity Framework Requirements",
+      "userQuery": "Trebam li još nešto prije nego krenemo s izvršavanjem zadataka iz dokumenta lab3.md?",
+      "agentResponse": "Trebalo bi provjeriti:\n1. Docker Desktop pokrenuta\n2. SQL Server kontejner\n3. Entity Framework NuGet paketi\n4. DbContext konfiguracija",
+      "actions": [
+        "Provjera User.cs modela",
+        "Provjera Activities.cs modela",
+        "Provjera appsettings.json",
+        "Provjera Program.cs"
+      ]
+    },
+    {
+      "turn": 2,
+      "topic": "Docker SQL Server Connection Issue",
+      "userQuery": "Docker desktop mi je pokrenut i dalje dobivam ovaj error...",
+      "issue": "SqlException: A network-related or instance-specific error occurred while establishing a connection to SQL Server",
+      "rootCause": "Docker daemon nije bio dostupan, SQL Server kontejner zaustavljen",
+      "solution": [
+        "Pokrenuta Docker Desktop",
+        "Provjereni zaustavaljeni kontejneri: docker ps -a",
+        "Pokrenuta SQL Server instanca: docker start b14d6bbdbba2",
+        "Čekano inicijaliziranje (10-20 sekundi)",
+        "Oslobođen port 5000",
+        "Aplikacija pokrenuta: dotnet run"
+      ],
+      "result": "✅ Aplikacija dostupna na http://localhost:5000"
+    },
+    {
+      "turn": 3,
+      "topic": "Database Management - Adding Users and Activities",
+      "userQuery": "Kako mogu upravljati novo stvorenom bazom? Dodavati korisnike aktivnosti i slično",
+      "optionsProvided": [
+        "Seed podaci u DbContext",
+        "Azure Data Studio (GUI)",
+        "UI Formulari u aplikaciji"
+      ],
+      "chosen": "Seed podaci + migracija",
+      "actions": [
+        "Ažuriran DbContext s seed podacima",
+        "Dodani 3 korisnika (ivan_temuhin, marija_fitness, petar_spiritual)",
+        "Dodane 4 aktivnosti i knjige"
+      ]
+    },
+    {
+      "turn": 4,
+      "topic": "Lab3 Completion Check",
+      "userQuery": "Jesu li svi Lab3 zahtjevi ispunjeni?",
+      "verification": [
+        "✅ EF Konfiguracija",
+        "✅ 9 Custom Ruta (4+ zahtjevano)",
+        "✅ semantic-model.md",
+        "✅ sitemap.md",
+        "✅ EF Repositories",
+        "✅ Build Success",
+        "✅ Application Running"
+      ],
+      "conclusion": "Lab 3 je završen - svi zahtjevi ispunjeni"
+    },
+    {
+      "turn": 5,
+      "topic": "Future Considerations - Authentication",
+      "userQuery": "Je li sad ima smisla prebaciti aplikaciju u login po korisniku?",
+      "recommendation": "Čekati Lab 4 za Authentication",
+      "reason": "Auth se obično uvodi kao specifičan lab sa best practices-ima",
+      "toAvoid": [
+        "Ručni login (nije production-ready)",
+        "Plain text lozinke",
+        "Auth logiku u controllersima"
+      ]
+    },
+    {
+      "turn": 6,
+      "topic": "Entity Framework Principles - Detailed Explanation",
+      "userQuery": "Objasni mi EF principe",
+      "conceptsExplained": [
+        "DbContext - veza s bazom",
+        "DbSet<T> - representacija tablica",
+        "Anotacije ([Key], [ForeignKey], virtual)",
+        "1-N Relacije",
+        "Migracije (dotnet ef migrations add/update)",
+        "Seed Podaci (HasData)",
+        "LINQ Upiti",
+        "Lazy Loading vs Eager Loading",
+        "TPH (Table Per Hierarchy) Nasljeđivanje"
+      ],
+      "examples": [
+        "User → Activities relacija",
+        "Activity tablica sa Discriminator stupcem",
+        "Include() za eager loading",
+        "Migracija workflow"
+      ]
+    },
+    {
+      "turn": 7,
+      "topic": "Routing Principles - Detailed Explanation",
+      "userQuery": "Objasni mi routing principe",
+      "conceptsExplained": [
+        "Konvencionalni Routing",
+        "Attribute Routing ([Route])",
+        "Route Constraints ({id:int}, {name:alpha}, itd.)",
+        "Primjeri iz projekta",
+        "Sitemap - sve rute mapirane",
+        "Kako routing funkcionira (korak po korak)",
+        "Razlika između routing tipova",
+        "Veza s View-ovima"
+      ],
+      "routesDocumented": 9,
+      "examples": [
+        "HomeController: /, /home, /dashboard",
+        "ActivityController: /aktivnosti, /aktivnosti/{id}, /aktivnosti/po-korisniku/{userId}",
+        "UserController: /korisnici, /korisnici/{id}, /korisnici/profil/{id}"
+      ]
+    },
+    {
+      "turn": 8,
+      "topic": "Skill.md Purpose and Effectiveness",
+      "userQuery": "Za što smo koristili skillove u aplikaciji? (skill.md)",
+      "explanation": "Skill je priručnik za Copilota koji definira kako raditi specifične zadatke u projektu",
+      "benefits": [
+        "Ubrzava rad - nema ponovnih objašnjenja",
+        "Sprječava greške - znamo gdje se nalaze datoteke",
+        "Osigurava konzistentnost - svi znaju standard",
+        "Zadovoljava Lab zahtjev - dio je Lab 3 evaluacije"
+      ],
+      "activation": "Skill se aktivira automatski prema patterns ključnim riječima",
+      "examples": [
+        "\"Trebam dodati property\" → Skill se aktivira",
+        "\"Trebam kreirati migraciju\" → Skill se aktivira",
+        "\"Trebam modificirati entity\" → Skill se aktivira"
+      ]
+    }
+  ],
+  "summary": {
+    "totalTurns": 8,
+    "mainTopics": [
+      "Docker & SQL Server Setup",
+      "Database Management",
+      "Lab3 Verification",
+      "EF Principles",
+      "Routing Principles",
+      "Skill Usage",
+      "Authentication Planning"
+    ],
+    "problemsSolved": 1,
+    "filesCreated": 3,
+    "filesModified": 8,
+    "requirementsCompleted": 5,
+    "overallProgress": "100%"
+  },
+  "technicalDetails": {
+    "framework": "ASP.NET Core 10",
+    "orm": "Entity Framework Core 10.0.7",
+    "database": "SQL Server (Docker)",
+    "dockerContainer": "gracious_driscoll (b14d6bbdbba2)",
+    "dbPort": 1433,
+    "appPort": 5000,
+    "entities": 9,
+    "routes": 9,
+    "seedDataUsers": 3,
+    "seedDataActivities": 5
+  },
+  "keyDecisions": [
+    "Korištenje SQL Server u Docker-u za bazu podataka",
+    "TPH nasljeđivanje za Activity tipove",
+    "Attribute routing za prilagođene URL-e",
+    "EF Repositories umjesto Mock Repositories",
+    "Seed podaci za inicijalne podatke",
+    "Skills za standardizaciju Copilot ponašanja"
+  ],
+  "recommendations": {
+    "immediate": [
+      "Testiraj sve 9 ruta u aplikaciji",
+      "Provjeri seed podatke u bazi",
+      "Validiraj EF upiti"
+    ],
+    "nextLab": [
+      "Implementiraj Authentication sa ASP.NET Identity",
+      "Dodaj Create/Edit/Delete forme",
+      "Implementiraj Role-based access control"
+    ]
+  }
+}

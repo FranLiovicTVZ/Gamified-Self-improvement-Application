@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.Json.Serialization;
 
@@ -10,6 +11,7 @@ namespace GamefiedSelfImprovement;
 /// </summary>
 public class User
 {
+    [Key]
     [JsonPropertyName("id")]
     public int Id { get; set; }
 
@@ -36,11 +38,11 @@ public class User
 
     // 1-N relationship s Activity-ima
     [JsonPropertyName("activities")]
-    public List<Activity> Activities { get; set; } = new();
+    public virtual ICollection<Activity> Activities { get; set; } = new List<Activity>();
 
     // 1-N relationship s DailyJournal-ima
     [JsonPropertyName("journals")]
-    public List<DailyJournal> Journals { get; set; } = new();
+    public virtual ICollection<DailyJournal> Journals { get; set; } = new List<DailyJournal>();
 
     // Preferencijes korisnika
     [JsonPropertyName("preferredMeditationType")]

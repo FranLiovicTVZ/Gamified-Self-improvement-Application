@@ -5,17 +5,28 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Gamified_Self_Improvement.Controllers;
 
+/// <summary>
+/// Home controller - početna stranica i dashboard
+/// </summary>
+[Route("")]
+[Route("home")]
 public class HomeController : Controller
 {
-    private readonly UserMockRepository _userRepository;
-    private readonly ActivityMockRepository _activityRepository;
+    private readonly UserRepository _userRepository;
+    private readonly ActivityRepository _activityRepository;
 
-    public HomeController(UserMockRepository userRepository, ActivityMockRepository activityRepository)
+    public HomeController(UserRepository userRepository, ActivityRepository activityRepository)
     {
         _userRepository = userRepository;
         _activityRepository = activityRepository;
     }
 
+    /// <summary>
+    /// Dashboard stranica
+    /// URL: / ili /home ili /dashboard
+    /// </summary>
+    [Route("")]
+    [Route("dashboard")]
     public IActionResult Dashboard()
     {
         var users = _userRepository.GetAll();
