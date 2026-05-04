@@ -1,0 +1,108 @@
+@model DailyJournal
+
+@{
+    ViewData["Title"] = "Dodaj Unos u Dnevnik";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1>📔 Dodaj Unos u Dnevnik</h1>
+            <p class="text-muted">Zabilježi svoje dnevne refleksije i napretke</p>
+
+            <form asp-action="CreateJournal" asp-controller="Activity" method="post" class="mt-4">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="UserId" class="form-label">👤 Korisnik</label>
+                        <select asp-for="UserId" class="form-control" required>
+                            <option value="">-- Odaberi Korisnika --</option>
+                            @foreach (var user in ViewBag.Users)
+                            {
+                                <option value="@user.Id">@user.Username (@user.Level. nivo)</option>
+                            }
+                        </select>
+                        <span asp-validation-for="UserId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="CompletedDate" class="form-label">📅 Datum</label>
+                        <input asp-for="CompletedDate" class="form-control" type="datetime-local" />
+                        <span asp-validation-for="CompletedDate" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label">📝 Naziv Unosa</label>
+                    <input asp-for="Title" class="form-control" placeholder="npr. Dnevna Refleksija" required />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">📋 Opis</label>
+                    <textarea asp-for="Description" class="form-control" rows="3" placeholder="Što si činila/činilo danas?"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Reflection" class="form-label">🤔 Refleksija</label>
+                    <textarea asp-for="Reflection" class="form-control" rows="4" placeholder="Tvoje misli i razmišljanja..."></textarea>
+                    <span asp-validation-for="Reflection" class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Mood" class="form-label">😊 Raspoloženje (1-10)</label>
+                        <div class="d-flex align-items-center">
+                            <input asp-for="Mood" class="form-control" type="range" min="1" max="10" value="5" />
+                            <span id="moodValue" class="ms-3">5</span>/10
+                        </div>
+                        <span asp-validation-for="Mood" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="EnergyLevel" class="form-label">⚡ Energija (1-10)</label>
+                        <div class="d-flex align-items-center">
+                            <input asp-for="EnergyLevel" class="form-control" type="range" min="1" max="10" value="5" />
+                            <span id="energyValue" class="ms-3">5</span>/10
+                        </div>
+                        <span asp-validation-for="EnergyLevel" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Difficulty" class="form-label">📈 Težina Dana</label>
+                    <select asp-for="Difficulty" class="form-control">
+                        <option value="Easy">🟢 Lak Dan</option>
+                        <option value="Medium" selected>🟡 Prosječan Dan</option>
+                        <option value="Hard">🔴 Težak Dan</option>
+                        <option value="Extreme">⚫ Izuzetno Težak Dan</option>
+                    </select>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success btn-lg">✅ Spremi Unos</button>
+                    <a asp-action="Index" asp-controller="Activity" class="btn btn-secondary">← Natrag na Aktivnosti</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Update mood display
+        document.querySelector('[asp-for="Mood"]').addEventListener('input', function() {
+            document.getElementById('moodValue').textContent = this.value;
+        });
+
+        // Update energy display
+        document.querySelector('[asp-for="EnergyLevel"]').addEventListener('input', function() {
+            document.getElementById('energyValue').textContent = this.value;
+        });
+    </script>
+}

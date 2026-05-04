@@ -1,0 +1,64 @@
+@model User
+
+@{
+    ViewData["Title"] = "Dodaj Novog Korisnika";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <h1>➕ Dodaj Novog Korisnika</h1>
+            <p class="text-muted">Kreiraj novi profil i počni s praćenjem svojih aktivnosti</p>
+
+            <form asp-action="Create" asp-controller="User" method="post" class="mt-4">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Username" class="form-label">👤 Korisničko Ime</label>
+                    <input asp-for="Username" class="form-control" placeholder="npr. ivan_fitness" required />
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label">📧 Email</label>
+                    <input asp-for="Email" class="form-control" type="email" placeholder="npr. ivan@example.com" required />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Level" class="form-label">⭐ Početni Nivo</label>
+                    <input asp-for="Level" class="form-control" type="number" value="1" min="1" max="100" />
+                    <span asp-validation-for="Level" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="TotalXP" class="form-label">💎 Početni XP</label>
+                    <input asp-for="TotalXP" class="form-control" type="number" value="0" min="0" />
+                    <span asp-validation-for="TotalXP" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="PreferredMeditationType" class="form-label">🧘 Preferirana Meditacija</label>
+                    <select asp-for="PreferredMeditationType" class="form-control">
+                        <option value="Guided">🎧 Vođena Meditacija</option>
+                        <option value="Breathing">💨 Disanje</option>
+                        <option value="Mantras">🔮 Mantras</option>
+                        <option value="Mindfulness" selected>🌿 Svjesnost</option>
+                        <option value="Visualization">🎨 Vizualizacija</option>
+                    </select>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success btn-lg">✅ Kreiraj Korisnika</button>
+                    <a asp-action="Index" asp-controller="User" class="btn btn-secondary">← Natrag na Korisnike</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

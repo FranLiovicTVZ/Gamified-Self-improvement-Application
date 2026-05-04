@@ -42,4 +42,38 @@ public class UserController : Controller
 
         return View(user);
     }
+
+    /// <summary>
+    /// Forma za kreiranje novog korisnika - GET
+    /// URL: /korisnici/dodaj
+    /// </summary>
+    [Route("dodaj")]
+    [HttpGet]
+    public IActionResult Create()
+    {
+        return View();
+    }
+
+    /// <summary>
+    /// Spremi novog korisnika - POST
+    /// URL: /korisnici/dodaj
+    /// </summary>
+    [Route("dodaj")]
+    [HttpPost]
+    public IActionResult Create(User user)
+    {
+        if (!ModelState.IsValid)
+            return View(user);
+
+        try
+        {
+            _userRepository.Add(user);
+            return RedirectToAction("Index");
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError("", $"Greška pri dodavanju korisnika: {ex.Message}");
+            return View(user);
+        }
+    }
 }

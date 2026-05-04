@@ -13,8 +13,17 @@
     }
     
     <div style="margin-bottom: 2rem;">
-        <h1>⚡ Aktivnosti @(userName != null ? $"- {userName}" : "")</h1>
-        <p class="page-subtitle">Pregledaj sve aktivnosti i njihove detalje</p>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h1>⚡ Aktivnosti @(userName != null ? $"- {userName}" : "")</h1>
+                <p class="page-subtitle">Pregledaj sve aktivnosti i njihove detalje</p>
+            </div>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <a asp-controller="Activity" asp-action="CreateExercise" class="btn btn-primary">💪 Dodaj Vježbu</a>
+                <a asp-controller="Activity" asp-action="CreateMeditation" class="btn btn-info">🧘 Dodaj Meditaciju</a>
+                <a asp-controller="Activity" asp-action="CreateJournal" class="btn btn-warning">📔 Dodaj Dnevnik</a>
+            </div>
+        </div>
     </div>
 
     @if (!Model.Any())

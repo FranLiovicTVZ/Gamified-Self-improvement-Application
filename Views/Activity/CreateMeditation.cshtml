@@ -1,0 +1,119 @@
+@model Meditation
+
+@{
+    ViewData["Title"] = "Dodaj Novu Meditaciju";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1>🧘 Dodaj Novu Meditaciju</h1>
+            <p class="text-muted">Zabilježi svoju meditacijsku sesiju i poboljšaj mentalnu jasnoću</p>
+
+            <form asp-action="CreateMeditation" asp-controller="Activity" method="post" class="mt-4">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="UserId" class="form-label">👤 Korisnik</label>
+                        <select asp-for="UserId" class="form-control" required>
+                            <option value="">-- Odaberi Korisnika --</option>
+                            @foreach (var user in ViewBag.Users)
+                            {
+                                <option value="@user.Id">@user.Username (@user.Level. nivo)</option>
+                            }
+                        </select>
+                        <span asp-validation-for="UserId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="MeditationType" class="form-label">🎯 Tip Meditacije</label>
+                        <select asp-for="MeditationType" class="form-control" required>
+                            <option value="Guided">🎧 Vođena Meditacija</option>
+                            <option value="Breathing">💨 Disanje</option>
+                            <option value="Mantras">🔮 Mantras</option>
+                            <option value="Mindfulness" selected>🌿 Svjesnost</option>
+                            <option value="Visualization">🎨 Vizualizacija</option>
+                        </select>
+                        <span asp-validation-for="MeditationType" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label">📝 Naziv</label>
+                    <input asp-for="Title" class="form-control" placeholder="npr. Ujutna Meditacija" required />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">📋 Opis</label>
+                    <textarea asp-for="Description" class="form-control" rows="3" placeholder="Detaljni opis meditacije..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="DurationMinutes" class="form-label">⏱️ Trajanje (minute)</label>
+                        <input asp-for="DurationMinutes" class="form-control" type="number" min="1" required />
+                        <span asp-validation-for="DurationMinutes" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="FocusArea" class="form-label">🎯 Fokus Područje</label>
+                        <input asp-for="FocusArea" class="form-control" placeholder="npr. Opća svjesnost, Emocije..." />
+                        <span asp-validation-for="FocusArea" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="StressReliefScore" class="form-label">😌 Smanjenje Stresa (1-10)</label>
+                        <input asp-for="StressReliefScore" class="form-control" type="number" min="1" max="10" value="5" />
+                        <span asp-validation-for="StressReliefScore" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="MentalClarity" class="form-label">🧠 Mentalna Jasnoća (1-10)</label>
+                        <input asp-for="MentalClarity" class="form-control" type="number" min="1" max="10" value="5" />
+                        <span asp-validation-for="MentalClarity" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Difficulty" class="form-label">📈 Težina</label>
+                        <select asp-for="Difficulty" class="form-control">
+                            <option value="Easy">🟢 Laka</option>
+                            <option value="Medium" selected>🟡 Srednja</option>
+                            <option value="Hard">🔴 Teška</option>
+                            <option value="Extreme">⚫ Ekstremna</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="AudioFilePath" class="form-label">🎵 Audio Datoteka</label>
+                        <input asp-for="AudioFilePath" class="form-control" placeholder="npr. /audio/meditation.mp3" />
+                        <span asp-validation-for="AudioFilePath" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Notes" class="form-label">📝 Bilješke</label>
+                    <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Dodatne napomene o meditaciji..."></textarea>
+                    <span asp-validation-for="Notes" class="text-danger"></span>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success btn-lg">✅ Spremi Meditaciju</button>
+                    <a asp-action="Index" asp-controller="Activity" class="btn btn-secondary">← Natrag na Aktivnosti</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,118 @@
+@model Exercise
+
+@{
+    ViewData["Title"] = "Dodaj Novu Vježbu";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1>💪 Dodaj Novu Vježbu</h1>
+            <p class="text-muted">Zapiši svoju vježbanju sesiju i prikupi XP!</p>
+
+            <form asp-action="CreateExercise" asp-controller="Activity" method="post" class="mt-4">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="UserId" class="form-label">👤 Korisnik</label>
+                        <select asp-for="UserId" class="form-control" required>
+                            <option value="">-- Odaberi Korisnika --</option>
+                            @foreach (var user in ViewBag.Users)
+                            {
+                                <option value="@user.Id">@user.Username (@user.Level. nivo)</option>
+                            }
+                        </select>
+                        <span asp-validation-for="UserId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="ExerciseType" class="form-label">🏃 Tip Vježbe</label>
+                        <select asp-for="ExerciseType" class="form-control" required>
+                            <option value="Strength">💪 Snaga</option>
+                            <option value="Cardio" selected>🏃 Kardio</option>
+                            <option value="Flexibility">🤸 Fleksibilnost</option>
+                            <option value="Sports">⚽ Sport</option>
+                        </select>
+                        <span asp-validation-for="ExerciseType" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label">📝 Naziv Vježbe</label>
+                    <input asp-for="Title" class="form-control" placeholder="npr. Trčanje 5km" required />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">📋 Opis</label>
+                    <textarea asp-for="Description" class="form-control" rows="3" placeholder="Detaljni opis vježbe..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="DurationMinutes" class="form-label">⏱️ Trajanje (minute)</label>
+                        <input asp-for="DurationMinutes" class="form-control" type="number" min="1" required />
+                        <span asp-validation-for="DurationMinutes" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="CaloriesBurned" class="form-label">🔥 Utrošene Kalorije</label>
+                        <input asp-for="CaloriesBurned" class="form-control" type="number" min="0" />
+                        <span asp-validation-for="CaloriesBurned" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Sets" class="form-label">📊 Setovi</label>
+                        <input asp-for="Sets" class="form-control" type="number" min="0" />
+                        <span asp-validation-for="Sets" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Reps" class="form-label">🔁 Ponavljanja</label>
+                        <input asp-for="Reps" class="form-control" type="number" min="0" />
+                        <span asp-validation-for="Reps" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Weight" class="form-label">⚖️ Težina (kg)</label>
+                        <input asp-for="Weight" class="form-control" type="number" step="0.5" min="0" />
+                        <span asp-validation-for="Weight" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Difficulty" class="form-label">📈 Težina</label>
+                        <select asp-for="Difficulty" class="form-control">
+                            <option value="Easy">🟢 Laka</option>
+                            <option value="Medium" selected>🟡 Srednja</option>
+                            <option value="Hard">🔴 Teška</option>
+                            <option value="Extreme">⚫ Ekstremna</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Location" class="form-label">📍 Lokacija</label>
+                        <input asp-for="Location" class="form-control" placeholder="npr. Teretana" />
+                        <span asp-validation-for="Location" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success btn-lg">✅ Spremi Vježbu</button>
+                    <a asp-action="Index" asp-controller="Activity" class="btn btn-secondary">← Natrag na Aktivnosti</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

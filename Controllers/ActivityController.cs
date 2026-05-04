@@ -57,4 +57,124 @@ public class ActivityController : Controller
 
         return View(activity);
     }
+
+    /// <summary>
+    /// Forma za dodavanje nove vježbe - GET
+    /// URL: /aktivnosti/nova-vjezba
+    /// </summary>
+    [Route("nova-vjezba")]
+    [HttpGet]
+    public IActionResult CreateExercise()
+    {
+        ViewBag.Users = _userRepository.GetAll();
+        return View();
+    }
+
+    /// <summary>
+    /// Spremi novu vježbu - POST
+    /// URL: /aktivnosti/nova-vjezba
+    /// </summary>
+    [Route("nova-vjezba")]
+    [HttpPost]
+    public IActionResult CreateExercise(Exercise exercise)
+    {
+        if (!ModelState.IsValid)
+        {
+            ViewBag.Users = _userRepository.GetAll();
+            return View(exercise);
+        }
+
+        try
+        {
+            exercise.ActivityType = ActivityType.Exercise;
+            _activityRepository.Add(exercise);
+            return RedirectToAction("Index");
+        }
+        catch (Exception ex)
+        {
+            ViewBag.Users = _userRepository.GetAll();
+            ModelState.AddModelError("", $"Greška pri dodavanju vježbe: {ex.Message}");
+            return View(exercise);
+        }
+    }
+
+    /// <summary>
+    /// Forma za dodavanje meditacije - GET
+    /// URL: /aktivnosti/nova-meditacija
+    /// </summary>
+    [Route("nova-meditacija")]
+    [HttpGet]
+    public IActionResult CreateMeditation()
+    {
+        ViewBag.Users = _userRepository.GetAll();
+        return View();
+    }
+
+    /// <summary>
+    /// Spremi novu meditaciju - POST
+    /// URL: /aktivnosti/nova-meditacija
+    /// </summary>
+    [Route("nova-meditacija")]
+    [HttpPost]
+    public IActionResult CreateMeditation(Meditation meditation)
+    {
+        if (!ModelState.IsValid)
+        {
+            ViewBag.Users = _userRepository.GetAll();
+            return View(meditation);
+        }
+
+        try
+        {
+            meditation.ActivityType = ActivityType.Meditation;
+            _activityRepository.Add(meditation);
+            return RedirectToAction("Index");
+        }
+        catch (Exception ex)
+        {
+            ViewBag.Users = _userRepository.GetAll();
+            ModelState.AddModelError("", $"Greška pri dodavanju meditacije: {ex.Message}");
+            return View(meditation);
+        }
+    }
+
+    /// <summary>
+    /// Forma za dodavanje unosa u dnevnik - GET
+    /// URL: /aktivnosti/novi-dnevnik
+    /// </summary>
+    [Route("novi-dnevnik")]
+    [HttpGet]
+    public IActionResult CreateJournal()
+    {
+        ViewBag.Users = _userRepository.GetAll();
+        return View();
+    }
+
+    /// <summary>
+    /// Spremi novi unos u dnevnik - POST
+    /// URL: /aktivnosti/novi-dnevnik
+    /// </summary>
+    [Route("novi-dnevnik")]
+    [HttpPost]
+    public IActionResult CreateJournal(DailyJournal journal)
+    {
+        if (!ModelState.IsValid)
+        {
+            ViewBag.Users = _userRepository.GetAll();
+            return View(journal);
+        }
+
+        try
+        {
+            journal.ActivityType = ActivityType.Journal;
+            _activityRepository.Add(journal);
+            return RedirectToAction("Index");
+        }
+        catch (Exception ex)
+        {
+            ViewBag.Users = _userRepository.GetAll();
+            ModelState.AddModelError("", $"Greška pri dodavanju dnevnika: {ex.Message}");
+            return View(journal);
+        }
+    }
 }
