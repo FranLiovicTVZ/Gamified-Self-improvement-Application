@@ -87,7 +87,21 @@ public class ActivityController : Controller
         try
         {
             exercise.ActivityType = ActivityType.Exercise;
+            // Izračunaj XP ako nije postavljen
+            if (exercise.XpReward == 0)
+            {
+                exercise.XpReward = exercise.CalculateXP();
+            }
             _activityRepository.Add(exercise);
+            
+            // Ažuriraj XP korisnika
+            var user = _userRepository.GetById(exercise.UserId);
+            if (user != null)
+            {
+                user.TotalXP += exercise.XpReward;
+                _userRepository.Update(user);
+            }
+            
             return RedirectToAction("Index");
         }
         catch (Exception ex)
@@ -127,7 +141,21 @@ public class ActivityController : Controller
         try
         {
             meditation.ActivityType = ActivityType.Meditation;
+            // Izračunaj XP ako nije postavljen
+            if (meditation.XpReward == 0)
+            {
+                meditation.XpReward = meditation.CalculateXP();
+            }
             _activityRepository.Add(meditation);
+            
+            // Ažuriraj XP korisnika
+            var user = _userRepository.GetById(meditation.UserId);
+            if (user != null)
+            {
+                user.TotalXP += meditation.XpReward;
+                _userRepository.Update(user);
+            }
+            
             return RedirectToAction("Index");
         }
         catch (Exception ex)
@@ -167,7 +195,21 @@ public class ActivityController : Controller
         try
         {
             journal.ActivityType = ActivityType.Journal;
+            // Izračunaj XP ako nije postavljen
+            if (journal.XpReward == 0)
+            {
+                journal.XpReward = journal.CalculateXP();
+            }
             _activityRepository.Add(journal);
+            
+            // Ažuriraj XP korisnika
+            var user = _userRepository.GetById(journal.UserId);
+            if (user != null)
+            {
+                user.TotalXP += journal.XpReward;
+                _userRepository.Update(user);
+            }
+            
             return RedirectToAction("Index");
         }
         catch (Exception ex)
