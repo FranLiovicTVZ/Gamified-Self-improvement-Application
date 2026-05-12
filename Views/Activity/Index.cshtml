@@ -24,6 +24,12 @@
                 <a asp-controller="Activity" asp-action="CreateJournal" class="btn btn-warning">📔 Dodaj Dnevnik</a>
             </div>
         </div>
+
+        <!-- Search Bar -->
+        <div style="margin-top: 1rem; position: relative;">
+            <input type="text" id="searchInput" class="form-control" placeholder="🔍 Pretraži aktivnosti po naslovu..." style="font-size: 1rem; padding: 0.75rem;">
+            <div id="searchResults" class="search-results" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; max-height: 300px; overflow-y: auto; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 1000;"></div>
+        </div>
     </div>
 
     @if (!Model.Any())
@@ -137,3 +143,63 @@
         </div>
     }
 </div>
+
+@section Scripts {
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
+            const userId = '@(userId ?? "")';
+
+            // AJAX pretraga s debouncing
+            let searchTimeout;
+            searchInput.addEventListener('keyup', function () {
+                clearTimeout(searchTimeout);
+                const query = this.value.trim();
+
+                if (query.length < 2) {
+                    searchResults.style.display = 'none';
+                    return;
+                }
+
+                searchTimeout = setTimeout(function () {
+                    let url = `/aktivnosti/pretraga?q=${encodeURIComponent(query)}`;
+                    if (userId) {
+                        url += `&userId=${encodeURIComponent(userId)}`;
+                    }
+                    
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.length > 0) {
+                                let html = '<div style="padding: 10px;">';
+                                data.forEach(function (activity) {
+                                    const emoji = activity.type === 'Exercise' ? '💪' : 
+                                                  activity.type === 'Meditation' ? '🧘' : '📝';
+                                    html += `<div style="padding: 8px; border-bottom: 1px solid #eee; cursor: pointer;" 
+                                                   onclick="window.location='/aktivnosti/${activity.id}'">
+                                                <strong>${emoji} ${activity.title}</strong><br>
+                                                <small>${activity.type} | Korisnik: ${activity.user} | ${activity.completed}</small>
+                                             </div>`;
+                                });
+                                html += '</div>';
+                                searchResults.innerHTML = html;
+                                searchResults.style.display = 'block';
+                            } else {
+                                searchResults.innerHTML = '<div style="padding: 10px;">Nema rezultata</div>';
+                                searchResults.style.display = 'block';
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                }, 300);
+            });
+
+            // Zatvori pretragu pri kliku izvan
+            document.addEventListener('click', function (e) {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.style.display = 'none';
+                }
+            });
+        });
+    </script>
+}

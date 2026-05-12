@@ -190,8 +190,10 @@
     </div>
 
     <!-- Action Buttons -->
-    <div class="action-buttons" style="margin-top: 2rem;">
+    <div class="action-buttons" style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
         <a href="@Url.Action("Index", "Activity", new { userId = Model.UserId })" class="btn btn-secondary">← Sve aktivnosti</a>
+        <a asp-controller="Activity" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">✏️ Uredi</a>
+        <a asp-controller="Activity" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">🗑️ Obrisi</a>
         <a asp-controller="User" asp-action="Details" asp-route-id="@Model.UserId" class="btn btn-primary">Korisnikov profil →</a>
     </div>
 </div>

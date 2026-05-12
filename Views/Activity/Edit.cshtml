@@ -1,0 +1,216 @@
+@using GamefiedSelfImprovement
+@model Activity
+
+@{
+    ViewData["Title"] = $"Uredi Aktivnost - {Model.Title}";
+    var activityType = ViewBag.ActivityType as string;
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1>✏️ Uredi Aktivnost</h1>
+            <p class="text-muted">Ažuriraj detalje aktivnosti</p>
+
+            <form asp-action="Edit" asp-controller="Activity" asp-route-id="@Model.Id" method="post" class="mt-4">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="UserId" class="form-label">👤 Korisnik</label>
+                        <select asp-for="UserId" class="form-control" required>
+                            <option value="">-- Odaberi Korisnika --</option>
+                            @foreach (var user in ViewBag.Users ?? new List<User>())
+                            {
+                                <option value="@user.Id" selected="@(user.Id == Model.UserId)">@user.Username (@user.Level. nivo)</option>
+                            }
+                        </select>
+                        <span asp-validation-for="UserId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">📌 Tip Aktivnosti</label>
+                        <input type="text" class="form-control" value="@Model.ActivityType.ToString()" disabled />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label">📝 Naslov</label>
+                    <input asp-for="Title" class="form-control" required />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">📋 Opis</label>
+                    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Difficulty" class="form-label">📈 Težina</label>
+                        <select asp-for="Difficulty" class="form-control">
+                            <option value="Easy">🟢 Laka</option>
+                            <option value="Medium">🟡 Srednja</option>
+                            <option value="Hard">🔴 Teška</option>
+                            <option value="Extreme">⚫ Ekstremna</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="CompletedDate" class="form-label">📅 Datum Dovršetka</label>
+                        <input asp-for="CompletedDate" class="form-control" type="datetime-local" />
+                        <span asp-validation-for="CompletedDate" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Specifično za Exercise -->
+                @if (Model is Exercise exercise)
+                {
+                    <hr />
+                    <h5>💪 Detalji Vježbe</h5>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">🏃 Tip Vježbe</label>
+                            <select name="ExerciseType" class="form-control">
+                                <option value="Strength" selected="@(exercise.ExerciseType == ExerciseType.Strength)">💪 Snaga</option>
+                                <option value="Cardio" selected="@(exercise.ExerciseType == ExerciseType.Cardio)">🏃 Kardio</option>
+                                <option value="Flexibility" selected="@(exercise.ExerciseType == ExerciseType.Flexibility)">🤸 Fleksibilnost</option>
+                                <option value="Sports" selected="@(exercise.ExerciseType == ExerciseType.Sports)">⚽ Sport</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">⏱️ Trajanje (minute)</label>
+                            <input type="number" name="DurationMinutes" class="form-control" value="@exercise.DurationMinutes" min="1" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">🔥 Utrošene Kalorije</label>
+                            <input type="number" name="CaloriesBurned" class="form-control" value="@exercise.CaloriesBurned" min="0" />
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">📍 Lokacija</label>
+                            <input type="text" name="Location" class="form-control" value="@exercise.Location" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">📊 Setovi</label>
+                            <input type="number" name="Sets" class="form-control" value="@exercise.Sets" min="0" />
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">🔁 Ponavljanja</label>
+                            <input type="number" name="Reps" class="form-control" value="@exercise.Reps" min="0" />
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">⚖️ Težina (kg)</label>
+                            <input type="number" name="Weight" class="form-control" value="@exercise.Weight" step="0.5" min="0" />
+                        </div>
+                    </div>
+                }
+
+                <!-- Specifično za Meditation -->
+                @if (Model is Meditation meditation)
+                {
+                    <hr />
+                    <h5>🧘 Detalji Meditacije</h5>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">🧘 Tip Meditacije</label>
+                            <select name="MeditationType" class="form-control">
+                                <option value="Guided" selected="@(meditation.MeditationType == MeditationType.Guided)">🎧 Vođena</option>
+                                <option value="Breathing" selected="@(meditation.MeditationType == MeditationType.Breathing)">💨 Disanje</option>
+                                <option value="Mantras" selected="@(meditation.MeditationType == MeditationType.Mantras)">🔮 Mantras</option>
+                                <option value="Mindfulness" selected="@(meditation.MeditationType == MeditationType.Mindfulness)">🌿 Svjesnost</option>
+                                <option value="Visualization" selected="@(meditation.MeditationType == MeditationType.Visualization)">🎨 Vizualizacija</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">⏱️ Trajanje (minute)</label>
+                            <input type="number" name="DurationMinutes" class="form-control" value="@meditation.DurationMinutes" min="1" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">🎯 Fokus</label>
+                            <input type="text" name="FocusArea" class="form-control" value="@meditation.FocusArea" />
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">🎵 Audio Datoteka</label>
+                            <input type="text" name="AudioFilePath" class="form-control" value="@meditation.AudioFilePath" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">😌 Razina Smirenja (1-10)</label>
+                            <input type="range" name="StressReliefScore" class="form-range" min="1" max="10" value="@meditation.StressReliefScore" />
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">🧠 Jasnoća Uma (1-10)</label>
+                            <input type="range" name="MentalClarity" class="form-range" min="1" max="10" value="@meditation.MentalClarity" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">📝 Bilješke</label>
+                        <textarea name="Notes" class="form-control" rows="2">@meditation.Notes</textarea>
+                    </div>
+                }
+
+                <!-- Specifično za DailyJournal -->
+                @if (Model is DailyJournal journal)
+                {
+                    <hr />
+                    <h5>📝 Detalji Dnevnika</h5>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">📅 Datum Dnevnika</label>
+                            <input type="datetime-local" name="JournalDate" class="form-control" value="@journal.JournalDate.ToString("yyyy-MM-ddTHH:mm")" />
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">😊 Raspoloženje (1-10)</label>
+                            <input type="range" name="Mood" class="form-range" min="1" max="10" value="@journal.Mood" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">⚡ Razina Energije (1-10)</label>
+                        <input type="range" name="EnergyLevel" class="form-range" min="1" max="10" value="@journal.EnergyLevel" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">💭 Refleksija</label>
+                        <textarea name="Reflection" class="form-control" rows="4">@journal.Reflection</textarea>
+                    </div>
+                }
+
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-success btn-lg">✅ Spremi Promjene</button>
+                    <a asp-action="Details" asp-controller="Activity" asp-route-id="@Model.Id" class="btn btn-secondary">← Nazad</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,41 @@
+@model User
+
+@{
+    ViewData["Title"] = $"Obrisi Korisnika - {Model.Username}";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="alert alert-danger">
+                <h2>⚠️ Brisanje Korisnika</h2>
+                <p>Jeste li sigurni da želite obrisati ovog korisnika?</p>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">👤 @Model.Username</h5>
+                    <p><strong>Email:</strong> @Model.Email</p>
+                    <p><strong>Nivo:</strong> @Model.Level</p>
+                    <p><strong>Ukupni XP:</strong> @Model.TotalXP</p>
+                    <p><strong>Aktivnosti:</strong> @(Model.Activities?.Count ?? 0)</p>
+                    <p><strong>Član od:</strong> @Model.CreatedDate.ToString("dd.MM.yyyy")</p>
+                    
+                    @if ((Model.Activities?.Count ?? 0) > 0)
+                    {
+                        <div class="alert alert-warning mt-3">
+                            <strong>Napomena:</strong> Ovaj korisnik ima @(Model.Activities?.Count ?? 0) aktivnosti. Brisanjem korisnika neće biti obrisane aktivnosti.
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <form asp-action="Delete" asp-controller="User" asp-route-id="@Model.Id" method="post" class="mt-4">
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-danger btn-lg">🗑️ Obriši Korisnika</button>
+                    <a asp-action="Details" asp-controller="User" asp-route-id="@Model.Id" class="btn btn-secondary">← Otkaži</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

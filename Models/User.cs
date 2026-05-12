@@ -15,9 +15,13 @@ public class User
     [JsonPropertyName("id")]
     public int Id { get; set; }
 
+    [Required(ErrorMessage = "Korisničko ime je obavezno")]
+    [StringLength(50, MinimumLength = 3, ErrorMessage = "Korisničko ime mora biti između 3 i 50 znakova")]
     [JsonPropertyName("username")]
     public string Username { get; set; } = string.Empty;
 
+    [Required(ErrorMessage = "Email je obavezan")]
+    [EmailAddress(ErrorMessage = "Email nije u ispravnom formatu")]
     [JsonPropertyName("email")]
     public string Email { get; set; } = string.Empty;
 
@@ -25,11 +29,14 @@ public class User
     public DateTime CreatedDate { get; set; } = DateTime.Now;
 
     [JsonPropertyName("totalXP")]
+    [Range(0, int.MaxValue, ErrorMessage = "XP ne smije biti negativan")]
     public int TotalXP { get; set; } = 0;
 
     [JsonPropertyName("level")]
+    [Range(1, 100, ErrorMessage = "Nivo mora biti između 1 i 100")]
     public int Level { get; set; } = 1;
 
+    [StringLength(500, ErrorMessage = "Bio ne smije biti duži od 500 znakova")]
     [JsonPropertyName("bio")]
     public string Bio { get; set; } = string.Empty;
 

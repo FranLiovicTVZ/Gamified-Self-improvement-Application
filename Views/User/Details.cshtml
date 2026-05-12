@@ -125,7 +125,9 @@
     </div>
 
     <!-- Back to Users Link -->
-    <div style="margin-top: 2rem;">
+    <div style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
         <a href="@Url.Action("Index", "User")" class="btn btn-primary">← Nazad na sve korisnike</a>
+        <a asp-controller="User" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">✏️ Uredi Profil</a>
+        <a asp-controller="User" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">🗑️ Obrisi Profil</a>
     </div>
 </div>

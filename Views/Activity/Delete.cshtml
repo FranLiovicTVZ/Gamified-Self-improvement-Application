@@ -1,0 +1,68 @@
+@using GamefiedSelfImprovement
+@model Activity
+
+@{
+    ViewData["Title"] = $"Obrisi Aktivnost - {Model.Title}";
+    var emoji = Model.ActivityType switch {
+        ActivityType.Exercise => "💪",
+        ActivityType.Meditation => "🧘",
+        ActivityType.Journal => "📝",
+        _ => "⚡"
+    };
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="alert alert-danger">
+                <h2>⚠️ Brisanje Aktivnosti</h2>
+                <p>Jeste li sigurni da želite obrisati ovu aktivnost?</p>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">@emoji @Model.Title</h5>
+                    <p><strong>Tip:</strong> @Model.ActivityType</p>
+                    <p><strong>Korisnik:</strong> @Model.User?.Username</p>
+                    <p><strong>Opis:</strong> @Model.Description</p>
+                    <p><strong>Dovršeno:</strong> @Model.CompletedDate.ToString("dd.MM.yyyy HH:mm")</p>
+                    <p><strong>Težina:</strong> @Model.Difficulty</p>
+                    <p><strong>XP Nagradu:</strong> <span style="color: #FFD700; font-weight: bold;">+@Model.XpReward</span></p>
+
+                    @if (Model is Exercise exercise)
+                    {
+                        <hr />
+                        <p><strong>💪 Trajanje:</strong> @exercise.DurationMinutes min</p>
+                        <p><strong>🔥 Kalorije:</strong> @exercise.CaloriesBurned</p>
+                        <p><strong>📍 Lokacija:</strong> @exercise.Location</p>
+                    }
+                    else if (Model is Meditation meditation)
+                    {
+                        <hr />
+                        <p><strong>🧘 Tip:</strong> @meditation.MeditationType</p>
+                        <p><strong>⏱️ Trajanje:</strong> @meditation.DurationMinutes min</p>
+                        <p><strong>😌 Razina Smirenja:</strong> @meditation.StressReliefScore/10</p>
+                    }
+                    else if (Model is DailyJournal journal)
+                    {
+                        <hr />
+                        <p><strong>📅 Datum:</strong> @journal.JournalDate.ToString("dd.MM.yyyy")</p>
+                        <p><strong>😊 Raspoloženje:</strong> @journal.Mood/10</p>
+                        <p><strong>⚡ Energija:</strong> @journal.EnergyLevel/10</p>
+                    }
+                </div>
+            </div>
+
+            <div class="alert alert-warning mt-3">
+                <strong>⚠️ Upozorenje:</strong> Brisanjem ove aktivnosti oduzet će se @Model.XpReward XP od korisnika. Ova akcija se ne može poništiti.
+            </div>
+
+            <form asp-action="Delete" asp-controller="Activity" asp-route-id="@Model.Id" method="post" class="mt-4">
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-danger btn-lg">🗑️ Obriši Aktivnost</button>
+                    <a asp-action="Details" asp-controller="Activity" asp-route-id="@Model.Id" class="btn btn-secondary">← Otkaži</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,6 +1,8 @@
 ﻿using GamefiedSelfImprovement;
 using Gamified_Self_Improvement.Repositories;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +23,22 @@ builder.Services.AddSingleton<UserMockRepository>();
 builder.Services.AddSingleton<ActivityMockRepository>();
 builder.Services.AddSingleton<GameDatabase>();
 
+// Configure localization for date time formatting (hr-HR and en-US)
+var supportedCultures = new[]
+{
+    new CultureInfo("hr-HR"),
+    new CultureInfo("en-US")
+};
+
 var app = builder.Build();
+
+// Configure request localization
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("hr-HR"),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+});
 
 // Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())

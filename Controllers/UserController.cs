@@ -76,4 +76,122 @@ public class UserController : Controller
             return View(user);
         }
     }
+
+    /// <summary>
+    /// Forma za uređivanje korisnika - GET
+    /// URL: /korisnici/uredi/{id}
+    /// </summary>
+    [Route("uredi/{id:int}")]
+    [HttpGet]
+    public IActionResult Edit(int id)
+    {
+        var user = _userRepository.GetById(id);
+        if (user == null)
+            return NotFound();
+
+        return View(user);
+    }
+
+    /// <summary>
+    /// Spremi uređenog korisnika - POST
+    /// URL: /korisnici/uredi/{id}
+    /// </summary>
+    [Route("uredi/{id:int}")]
+    [HttpPost]
+    [ActionName("Edit")]
+    public IActionResult EditPost(int id, User user)
+    {
+        var existingUser = _userRepository.GetById(id);
+        if (existingUser == null)
+            return NotFound();
+
+        if (!ModelState.IsValid)
+            return View(nameof(Edit), existingUser);
+
+        try
+        {
+            // Ažuriraj samo dopuštena polja
+            existingUser.Username = user.Username;
+            existingUser.Email = user.Email;
+            existingUser.Bio = user.Bio;
+            existingUser.PreferredMeditationType = user.PreferredMeditationType;
+            existingUser.Level = user.Level;
+
+            _userRepository.Update(existingUser);
+            return RedirectToAction("Details", new { id = id });
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError("", $"Greška pri ažuriranju korisnika: {ex.Message}");
+            return View(nameof(Edit), existingUser);
+        }
+    }
+
+    /// <summary>
+    /// Forma za brisanje korisnika - GET (potvrda)
+    /// URL: /korisnici/obrisi/{id}
+    /// </summary>
+    [Route("obrisi/{id:int}")]
+    [HttpGet]
+    public IActionResult Delete(int id)
+    {
+        var user = _userRepository.GetById(id);
+        if (user == null)
+            return NotFound();
+
+        return View(user);
+    }
+
+    /// <summary>
+    /// Briše korisnika - POST
+    /// URL: /korisnici/obrisi/{id}
+    /// </summary>
+    [Route("obrisi/{id:int}")]
+    [HttpPost]
+    [ActionName("Delete")]
+    public IActionResult DeletePost(int id)
+    {
+        var user = _userRepository.GetById(id);
+        if (user == null)
+            return NotFound();
+
+        try
+        {
+            _userRepository.Delete(id);
+            return RedirectToAction("Index");
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError("", $"Greška pri brisanju korisnika: {ex.Message}");
+            return View(nameof(Delete), user);
+        }
+    }
+
+    /// <summary>
+    /// AJAX pretraga korisnika
+    /// URL: /korisnici/pretraga?q=search_term
+    /// </summary>
+    [Route("pretraga")]
+    [HttpGet]
+    public IActionResult Search(string q)
+    {
+        if (string.IsNullOrWhiteSpace(q))
+            return Json(new List<object>());
+
+        var searchQuery = q.ToLower();
+        var results = _userRepository.GetAll()
+            .Where(u => u.Username.ToLower().Contains(searchQuery) || 
+                        u.Email.ToLower().Contains(searchQuery))
+            .Take(10)
+            .Select(u => new { 
+                id = u.Id, 
+                username = u.Username,
+                email = u.Email,
+                level = u.Level,
+                xp = u.TotalXP
+            })
+            .ToList();
+
+        return Json(results);
+    }
 }

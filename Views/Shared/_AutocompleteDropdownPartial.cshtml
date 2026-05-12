@@ -1,0 +1,262 @@
+@{
+    // Autocomplete Dropdown Partial View
+    // Korištenje: @Html.PartialAsync("_AutocompleteDropdown", new { 
+    //     propertyName = "UserId", 
+    //     label = "👤 Korisnik",
+    //     endpoint = "/korisnici/pretraga",
+    //     displayField = "username",
+    //     valueField = "id",
+    //     required = true
+    // })
+    
+    var propertyName = ViewData["propertyName"]?.ToString() ?? "SelectField";
+    var label = ViewData["label"]?.ToString() ?? "Odaberi stavku";
+    var endpoint = ViewData["endpoint"]?.ToString() ?? "/api/search";
+    var displayField = ViewData["displayField"]?.ToString() ?? "name";
+    var valueField = ViewData["valueField"]?.ToString() ?? "id";
+    var required = (ViewData["required"]?.ToString() ?? "false") == "true";
+}
+
+<div class="form-group mb-3">
+    <label for="@propertyName" class="form-label">@label</label>
+    
+    <div class="autocomplete-container">
+        <input type="text" 
+               id="@propertyName-search" 
+               class="form-control autocomplete-search" 
+               placeholder="Počni pisati za pretragu..." 
+               autocomplete="off">
+        
+        <div id="@propertyName-dropdown" class="autocomplete-dropdown" style="display: none;">
+            <ul id="@propertyName-results" class="autocomplete-list"></ul>
+        </div>
+    </div>
+    
+    <input type="hidden" id="@propertyName" name="@propertyName" @(required ? "required" : "") />
+    <input type="hidden" id="@propertyName-display" />
+    <small class="form-text text-muted">Počni pisati za pretragu stavki</small>
+</div>
+
+<style>
+    .autocomplete-container {
+        position: relative;
+    }
+
+    .autocomplete-search {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    .autocomplete-search:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+    }
+
+    .autocomplete-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: white;
+        border: 1px solid #ddd;
+        border-top: none;
+        border-radius: 0 0 4px 4px;
+        max-height: 250px;
+        overflow-y: auto;
+        z-index: 100;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .autocomplete-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .autocomplete-list li {
+        padding: 10px;
+        cursor: pointer;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background-color 0.2s;
+    }
+
+    .autocomplete-list li:hover,
+    .autocomplete-list li.highlighted {
+        background-color: #f8f9fa;
+        color: #007bff;
+    }
+
+    .autocomplete-list li:last-child {
+        border-bottom: none;
+    }
+
+    .autocomplete-no-results {
+        padding: 10px;
+        text-align: center;
+        color: #999;
+    }
+
+    .selected-item {
+        display: inline-block;
+        background-color: #e3f2fd;
+        color: #007bff;
+        padding: 4px 8px;
+        border-radius: 4px;
+        margin-top: 5px;
+        font-size: 12px;
+    }
+
+    .selected-item .remove {
+        cursor: pointer;
+        margin-left: 5px;
+        font-weight: bold;
+        color: #d32f2f;
+    }
+</style>
+
+<script type="text/javascript">
+    $(function () {
+        const propertyName = '@propertyName';
+        const endpoint = '@endpoint';
+        const displayField = '@displayField';
+        const valueField = '@valueField';
+
+        const searchInput = $('#' + propertyName + '-search');
+        const dropdown = $('#' + propertyName + '-dropdown');
+        const resultsList = $('#' + propertyName + '-results');
+        const hiddenInput = $('#' + propertyName);
+        const displayInput = $('#' + propertyName + '-display');
+
+        let debounceTimer;
+        let selectedIndex = -1;
+        let results = [];
+
+        // Pretraga na unos
+        searchInput.on('input', function () {
+            clearTimeout(debounceTimer);
+            const query = $(this).val().trim();
+
+            if (query.length < 2) {
+                dropdown.hide();
+                return;
+            }
+
+            debounceTimer = setTimeout(function () {
+                $.ajax({
+                    url: endpoint,
+                    type: 'GET',
+                    data: { q: query },
+                    success: function (data) {
+                        results = data;
+                        selectedIndex = -1;
+                        resultsList.empty();
+
+                        if (results.length > 0) {
+                            results.forEach(function (item, index) {
+                                const displayText = item[displayField];
+                                const liItem = $('<li>')
+                                    .attr('data-value', item[valueField])
+                                    .attr('data-index', index)
+                                    .html(displayText)
+                                    .on('click', function () {
+                                        selectItem(item);
+                                    })
+                                    .on('mouseenter', function () {
+                                        resultsList.find('li').removeClass('highlighted');
+                                        $(this).addClass('highlighted');
+                                        selectedIndex = index;
+                                    });
+                                resultsList.append(liItem);
+                            });
+                            dropdown.show();
+                        } else {
+                            resultsList.html('<li class="autocomplete-no-results">Nema rezultata</li>');
+                            dropdown.show();
+                        }
+                    }
+                });
+            }, 300);
+        });
+
+        // Navigacija sa strelicama
+        searchInput.on('keydown', function (e) {
+            if (!dropdown.is(':visible')) return;
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                selectedIndex = Math.min(selectedIndex + 1, results.length - 1);
+                updateHighlight();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                selectedIndex = Math.max(selectedIndex - 1, -1);
+                updateHighlight();
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (selectedIndex >= 0 && selectedIndex < results.length) {
+                    selectItem(results[selectedIndex]);
+                }
+            } else if (e.key === 'Escape') {
+                dropdown.hide();
+            }
+        });
+
+        function updateHighlight() {
+            resultsList.find('li').removeClass('highlighted');
+            if (selectedIndex >= 0 && selectedIndex < results.length) {
+                resultsList.find('li').eq(selectedIndex).addClass('highlighted');
+            }
+        }
+
+        function selectItem(item) {
+            const valueText = item[displayField];
+            hiddenInput.val(item[valueField]);
+            displayInput.val(JSON.stringify(item));
+            searchInput.val(valueText);
+            dropdown.hide();
+
+            // Trigger change event
+            hiddenInput.trigger('change');
+
+            // Prikaži odabranu stavku
+            showSelectedItem(valueText);
+        }
+
+        function showSelectedItem(text) {
+            // Ukloni prethodnu stavku ako postoji
+            $('.selected-item').remove();
+            
+            // Dodaj novu odabranu stavku
+            const selectedItem = $('<div class="selected-item">')
+                .html(text + ' <span class="remove" onclick="removeSelection(\'' + propertyName + '\')">×</span>')
+                .insertAfter(searchInput);
+        }
+
+        // Zatvori dropdown pri kliku izvan
+        $(document).on('click', function (e) {
+            if (!$(e.target).closest('#' + propertyName + '-search, #' + propertyName + '-dropdown').length) {
+                dropdown.hide();
+            }
+        });
+
+        // Postavi inicijalnu vrijednost ako postoji
+        const initialValue = hiddenInput.val();
+        if (initialValue) {
+            const displayText = displayInput.val();
+            if (displayText) {
+                searchInput.val(JSON.parse(displayText)[displayField]);
+                showSelectedItem(JSON.parse(displayText)[displayField]);
+            }
+        }
+    });
+
+    function removeSelection(propertyName) {
+        $('#' + propertyName).val('');
+        $('#' + propertyName + '-display').val('');
+        $('#' + propertyName + '-search').val('');
+        $('.selected-item').remove();
+    }
+</script>

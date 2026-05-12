@@ -1,0 +1,236 @@
+{
+  "session": {
+    "date": "2026-05-11 to 2026-05-12",
+    "lab": "Lab 4",
+    "title": "CRUD Operacije, Validacija, AJAX i Animacije",
+    "status": "✅ USPJEŠAN - Svi zahtjevi implementirani"
+  },
+  "conversations": [
+    {
+      "id": 1,
+      "type": "Implementation",
+      "topic": "Model Validacija",
+      "user_question": "Gdje su validacijski constraint-i u kodu?",
+      "agent_answer": "Validacija je na tri nivoa: Data Annotations u modelima, ModelState.IsValid u kontrolerima, i HTML5 atributi u view-ovima.",
+      "key_points": [
+        "User: [Required], [StringLength(50, MinimumLength = 3)], [EmailAddress], [Range(1, 100)]",
+        "Activity: [Required], [StringLength(200)], [Range(1, 480)]",
+        "Exercise: [Range(0, 5000)] za CaloriesBurned, [Range(0, 500)] za Weight",
+        "Meditation: [Range(1, 10)] za StressReliefScore i MentalClarity",
+        "DailyJournal: [Range(1, 10)] za Mood i EnergyLevel"
+      ]
+    },
+    {
+      "id": 2,
+      "type": "Debugging",
+      "topic": "Build Greške",
+      "user_question": "Aplikacija ne kompajlira - koja su rješenja?",
+      "agent_answer": "Tri kritične greške ispravljene: CS0234 (namespace), CS0103 (@keyframes), CS8602 (null reference)",
+      "solutions": [
+        {
+          "error": "CS0234 RequestLocalizationOptions",
+          "file": "Program.cs",
+          "fix": "Added: using Microsoft.AspNetCore.Localization;"
+        },
+        {
+          "error": "CS0103 @keyframes",
+          "file": "_DateTimePickerPartial.cshtml",
+          "fix": "Changed @keyframes to @@keyframes (Razor escaping)"
+        },
+        {
+          "error": "CS8602 Null Reference",
+          "file": "User/Delete.cshtml",
+          "fix": "Changed Model.Activities.Count to Model.Activities?.Count ?? 0"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "Feature",
+      "topic": "Search Bar Funkcionalnost",
+      "user_question": "Gdje je u aplikaciji padajući izbornik? Ja vidim samo search bar",
+      "agent_answer": "Padajući izbornik je ispod search bar-a i pojavljuje se dinamički kada korisnik počne tipkati 2+ znaka.",
+      "details": {
+        "location": "Views/User/Index.cshtml linija 22, Views/Activity/Index.cshtml linija 28",
+        "implementation": "Fetch API sa 300ms debouncing",
+        "positioning": "position: absolute sa top: 100%, left: 0, right: 0",
+        "styling": "White background, border, shadow, z-index: 1000"
+      }
+    },
+    {
+      "id": 4,
+      "type": "Feature",
+      "topic": "CRUD Operacije",
+      "user_question": "Kako su implementirane Create, Read, Update, Delete operacije?",
+      "agent_answer": "Kompletan CRUD sa validacijom, error handling-om, i type-specific operacijama.",
+      "implementation": {
+        "Create": {
+          "User": "POST /korisnici/dodaj",
+          "Activities": "POST /vježbe/kreiraj, /meditacija/kreiraj, /dnevnik/kreiraj",
+          "validation": "ModelState.IsValid check pre spremi"
+        },
+        "Read": {
+          "User": "GET /korisnici/{id}",
+          "Activities": "GET /aktivnosti/{id}",
+          "List": "GET /korisnici, GET /aktivnosti"
+        },
+        "Update": {
+          "User": "GET /korisnici/uredi/{id}, POST /korisnici/uredi/{id}",
+          "Activities": "GET /aktivnosti/uredi/{id}, POST /aktivnosti/uredi/{id}",
+          "special": "Universal Activity/Edit.cshtml sa type detection"
+        },
+        "Delete": {
+          "User": "GET /korisnici/obrisi/{id}, POST /korisnici/obrisi/{id}",
+          "Activities": "GET /aktivnosti/obrisi/{id}, POST /aktivnosti/obrisi/{id}",
+          "xp_return": "Pri brisanju aktivnosti, XP se vraća korisniku"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "type": "Feature",
+      "topic": "AJAX Dropdown Pretraga",
+      "user_question": "Kako radi AJAX pretraga bez jQuery?",
+      "agent_answer": "Korištena Fetch API (vanilla JavaScript) sa debouncing-om i keyboard navigacijom.",
+      "code_example": {
+        "endpoint": "GET /korisnici/pretraga?q=query",
+        "response": "[{id, username, email, level, xp}, ...]",
+        "debouncing": "300ms delay između zahtjeva",
+        "ui_behavior": "Dropdown se pojavljuje ispod input-a, zatvara se klikkom izvan"
+      }
+    },
+    {
+      "id": 6,
+      "type": "Feature",
+      "topic": "Custom DateTime Picker",
+      "user_question": "Kako je implementiran custom datetime picker?",
+      "agent_answer": "Modal-based picker sa dual format: display (dd.MM.yyyy HH:mm) i hidden input (ISO yyyy-MM-ddTHH:mm).",
+      "features": [
+        "Modal interface (ne HTML5 default)",
+        "Date i time input polja",
+        "\"Sada\" button za trenutno vrijeme",
+        "\"OK\" i \"Odustani\" buttons",
+        "Croatian localization (hr-HR)",
+        "ISO format za server, HR format za prikaz"
+      ]
+    },
+    {
+      "id": 7,
+      "type": "Feature",
+      "topic": "JavaScript Animacije",
+      "user_question": "Koja je struktura animacijske biblioteke?",
+      "agent_answer": "300+ linija custom animations.js sa 8+ tipova animacija implementiranih.",
+      "animations": {
+        "card_fade_in": {
+          "description": "Fade-in sa staggered delay na card učitavanju",
+          "selector": ".user-card, .activity-card",
+          "duration": "0.6s ease-out sa 0.1s delay između"
+        },
+        "button_ripple": {
+          "description": "Ripple effect pri kliku na button",
+          "implementation": "CSS animation sa RGBA spread",
+          "visual": "Kružni val ide od klika prema краям button-a"
+        },
+        "xp_bar_animation": {
+          "description": "Width animation za XP progress bar",
+          "effects": "Pulse effect sa box-shadow animation",
+          "speed": "30ms frame rate sa exponential easing"
+        },
+        "form_validation": {
+          "invalid": "Shake animation (5px left/right)",
+          "valid": "SlideIn animation (opacity + translate)",
+          "duration": "0.3s ease-out"
+        },
+        "scroll_animations": {
+          "implementation": "IntersectionObserver API",
+          "trigger": "Fade-in kada je element u viewport-u",
+          "options": "root margin za early trigger"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "type": "Testing",
+      "topic": "Search Bar Testiranje",
+      "user_question": "Tipkam u search bar ali padajući izbornik ne radi - što je problem?",
+      "agent_answer": "Pronašao sam 3 problema: 1) jQuery slim nema $.ajax, 2) parent div nemao position: relative, 3) searchResults display nije se pravilno mijenjao.",
+      "fixes": [
+        {
+          "issue": "$.ajax is not a function",
+          "cause": "jQuery 3.3.1 slim verzija nema AJAX",
+          "solution": "Korištena Fetch API umjesto jQuery"
+        },
+        {
+          "issue": "Search dropdown nije vidljiv",
+          "cause": "parent container nemao position: relative",
+          "solution": "Dodana position: relative i top: 100%, left: 0, right: 0"
+        },
+        {
+          "issue": "setTimeout nije detektovao promjene",
+          "cause": "Stari jQuery kod koristio .hide()/.show()",
+          "solution": "Korišteno .style.display = 'none'/'block'"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "Documentation",
+      "topic": "Validacija Nivoi",
+      "user_question": "Kako si implementirao validaciju u kodu?",
+      "agent_answer": "Validacija na tri nivoa - u modelima, kontrolerima i prikazima.",
+      "three_levels": {
+        "level_1_models": "Data Annotations ([Required], [StringLength], [Range], [EmailAddress])",
+        "level_2_controllers": "ModelState.IsValid provjera sa error handling-om",
+        "level_3_views": "HTML5 atributi (min, max, pattern, required) + asp-validation-for span-ovi"
+      }
+    },
+    {
+      "id": 10,
+      "type": "Query",
+      "topic": "SQL Constraints Lokacija",
+      "user_question": "gdje su sql constraints u kodu?",
+      "agent_answer": "SQL constraints se trebali biti u migracijama. Trebalo bi dodati HasMaxLength(), HasPrecision(), u OnModelCreating().",
+      "current_state": "Constraints su samo u Data Annotations, trebala bi nova migracija sa fluent API konfiguracijama",
+      "recommendation": "Trebalo bi: dotnet ef migrations add AddSQLConstraints && dotnet ef database update"
+    }
+  ],
+  "build_history": [
+    {
+      "attempt": 1,
+      "result": "❌ FAILED",
+      "errors": [
+        "CS0234: RequestLocalizationOptions namespace",
+        "CS0103: @keyframes u Razor",
+        "CS8602: Null reference warning"
+      ]
+    },
+    {
+      "attempt": 2,
+      "result": "✅ SUCCESS",
+      "errors_fixed": [
+        "Added using Microsoft.AspNetCore.Localization",
+        "Changed @keyframes to @@keyframes",
+        "Added null-safety checks"
+      ],
+      "command": "dotnet run",
+      "output": "Now listening on: http://localhost:5000"
+    }
+  ],
+  "statistics": {
+    "total_files_modified": 15,
+    "total_lines_added": 1650,
+    "controllers": 2,
+    "views": 10,
+    "models": 2,
+    "javascript_files": 2,
+    "partial_views": 2,
+    "layout_files": 1
+  },
+  "final_status": {
+    "build": "✅ SUCCESSFUL",
+    "runtime": "✅ RUNNING",
+    "all_requirements_met": true,
+    "points": 7,
+    "completion_date": "2026-05-12"
+  }
+}

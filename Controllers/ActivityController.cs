@@ -219,4 +219,170 @@ public class ActivityController : Controller
             return View(journal);
         }
     }
+
+    /// <summary>
+    /// Forma za uređivanje aktivnosti - GET
+    /// URL: /aktivnosti/uredi/{id}
+    /// </summary>
+    [Route("uredi/{id:int}")]
+    [HttpGet]
+    public IActionResult Edit(int id)
+    {
+        var activity = _activityRepository.GetById(id);
+        if (activity == null)
+            return NotFound();
+
+        ViewBag.Users = _userRepository.GetAll();
+        ViewBag.ActivityType = activity.ActivityType.ToString();
+        
+        return View(activity);
+    }
+
+    /// <summary>
+    /// Spremi uređenu aktivnost - POST
+    /// URL: /aktivnosti/uredi/{id}
+    /// </summary>
+    [Route("uredi/{id:int}")]
+    [HttpPost]
+    [ActionName("Edit")]
+    public IActionResult EditPost(int id, Activity activity)
+    {
+        var existingActivity = _activityRepository.GetById(id);
+        if (existingActivity == null)
+            return NotFound();
+
+        if (!ModelState.IsValid)
+        {
+            ViewBag.Users = _userRepository.GetAll();
+            ViewBag.ActivityType = existingActivity.ActivityType.ToString();
+            return View(nameof(Edit), existingActivity);
+        }
+
+        try
+        {
+            // Ažuriraj samo dopuštena polja
+            existingActivity.Title = activity.Title;
+            existingActivity.Description = activity.Description;
+            existingActivity.Difficulty = activity.Difficulty;
+            existingActivity.CompletedDate = activity.CompletedDate;
+
+            // Ažuriraj type-specifična polja
+            if (existingActivity is Exercise exercise && activity is Exercise actExercise)
+            {
+                exercise.DurationMinutes = actExercise.DurationMinutes;
+                exercise.CaloriesBurned = actExercise.CaloriesBurned;
+                exercise.Sets = actExercise.Sets;
+                exercise.Reps = actExercise.Reps;
+                exercise.Weight = actExercise.Weight;
+                exercise.Location = actExercise.Location;
+                exercise.ExerciseType = actExercise.ExerciseType;
+            }
+            else if (existingActivity is Meditation meditation && activity is Meditation actMeditation)
+            {
+                meditation.DurationMinutes = actMeditation.DurationMinutes;
+                meditation.MeditationType = actMeditation.MeditationType;
+                meditation.FocusArea = actMeditation.FocusArea;
+                meditation.StressReliefScore = actMeditation.StressReliefScore;
+                meditation.MentalClarity = actMeditation.MentalClarity;
+                meditation.Notes = actMeditation.Notes;
+            }
+            else if (existingActivity is DailyJournal journal && activity is DailyJournal actJournal)
+            {
+                journal.JournalDate = actJournal.JournalDate;
+                journal.Reflection = actJournal.Reflection;
+                journal.Mood = actJournal.Mood;
+                journal.EnergyLevel = actJournal.EnergyLevel;
+            }
+
+            _activityRepository.Update(existingActivity);
+            return RedirectToAction("Details", new { id = id });
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError("", $"Greška pri ažuriranju aktivnosti: {ex.Message}");
+            ViewBag.Users = _userRepository.GetAll();
+            ViewBag.ActivityType = existingActivity.ActivityType.ToString();
+            return View(nameof(Edit), existingActivity);
+        }
+    }
+
+    /// <summary>
+    /// Forma za brisanje aktivnosti - GET (potvrda)
+    /// URL: /aktivnosti/obrisi/{id}
+    /// </summary>
+    [Route("obrisi/{id:int}")]
+    [HttpGet]
+    public IActionResult Delete(int id)
+    {
+        var activity = _activityRepository.GetById(id);
+        if (activity == null)
+            return NotFound();
+
+        return View(activity);
+    }
+
+    /// <summary>
+    /// Briše aktivnost - POST
+    /// URL: /aktivnosti/obrisi/{id}
+    /// </summary>
+    [Route("obrisi/{id:int}")]
+    [HttpPost]
+    [ActionName("Delete")]
+    public IActionResult DeletePost(int id)
+    {
+        var activity = _activityRepository.GetById(id);
+        if (activity == null)
+            return NotFound();
+
+        try
+        {
+            // Oduzmi XP od korisnika prije brisanja
+            var user = _userRepository.GetById(activity.UserId);
+            if (user != null && activity.XpReward > 0)
+            {
+                user.TotalXP = Math.Max(0, user.TotalXP - activity.XpReward);
+                _userRepository.Update(user);
+            }
+
+            _activityRepository.Delete(id);
+            return RedirectToAction("Index");
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError("", $"Greška pri brisanju aktivnosti: {ex.Message}");
+            return View(nameof(Delete), activity);
+        }
+    }
+
+    /// <summary>
+    /// AJAX pretraga aktivnosti
+    /// URL: /aktivnosti/pretraga?q=search_term
+    /// </summary>
+    [Route("pretraga")]
+    [HttpGet]
+    public IActionResult Search(string q, int? userId = null)
+    {
+        if (string.IsNullOrWhiteSpace(q))
+            return Json(new List<object>());
+
+        var activities = userId.HasValue
+            ? _activityRepository.GetByUserId(userId.Value)
+            : _activityRepository.GetAll();
+
+        var searchQuery = q.ToLower();
+        var results = activities
+            .Where(a => a.Title.ToLower().Contains(searchQuery) || 
+                        a.Description.ToLower().Contains(searchQuery))
+            .Take(10)
+            .Select(a => new { 
+                id = a.Id, 
+                title = a.Title, 
+                type = a.ActivityType.ToString(),
+                user = a.User?.Username,
+                completed = a.CompletedDate.ToString("dd.MM.yyyy")
+            })
+            .ToList();
+
+        return Json(results);
+    }
 }

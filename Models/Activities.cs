@@ -67,9 +67,12 @@ public abstract class Activity
 
     public virtual User? User { get; set; }
 
+    [Required(ErrorMessage = "Naslov je obavezan")]
+    [StringLength(200, MinimumLength = 3, ErrorMessage = "Naslov mora biti između 3 i 200 znakova")]
     [JsonPropertyName("title")]
     public string Title { get; set; } = string.Empty;
 
+    [StringLength(1000, ErrorMessage = "Opis ne smije biti duži od 1000 znakova")]
     [JsonPropertyName("description")]
     public string Description { get; set; } = string.Empty;
 
@@ -77,6 +80,7 @@ public abstract class Activity
     public DateTime CompletedDate { get; set; } = DateTime.Now;
 
     [JsonPropertyName("xpReward")]
+    [Range(0, 10000, ErrorMessage = "XP mora biti između 0 i 10000")]
     public int XpReward { get; set; }
 
     [JsonPropertyName("activityType")]
@@ -105,24 +109,31 @@ public class Exercise : Activity
     [JsonPropertyName("exerciseType")]
     public ExerciseType ExerciseType { get; set; }
 
+    [Required(ErrorMessage = "Trajanje je obavezno")]
+    [Range(1, 480, ErrorMessage = "Trajanje mora biti između 1 i 480 minuta")]
     [JsonPropertyName("durationMinutes")]
     public int DurationMinutes { get; set; }
 
+    [Range(0, 5000, ErrorMessage = "Kalorije moraju biti između 0 i 5000")]
     [JsonPropertyName("caloriesBurned")]
     public int CaloriesBurned { get; set; }
 
+    [Range(0, 100, ErrorMessage = "Setovi moraju biti između 0 i 100")]
     [JsonPropertyName("sets")]
     public int Sets { get; set; }
 
+    [Range(0, 100, ErrorMessage = "Ponavljanja moraju biti između 0 i 100")]
     [JsonPropertyName("reps")]
     public int Reps { get; set; }
 
+    [Range(0, 500, ErrorMessage = "Težina mora biti između 0 i 500 kg")]
     [JsonPropertyName("weight")]
     public decimal Weight { get; set; } // kg
 
     [JsonPropertyName("muscleGroups")]
     public List<string> MuscleGroups { get; set; } = new();
 
+    [StringLength(100, ErrorMessage = "Lokacija ne smije biti duža od 100 znakova")]
     [JsonPropertyName("location")]
     public string Location { get; set; } = "Kuća"; // "Teretana", "Park", itd
 
@@ -209,21 +220,28 @@ public class Meditation : Activity
     [JsonPropertyName("meditationType")]
     public MeditationType MeditationType { get; set; }
 
+    [Required(ErrorMessage = "Trajanje je obavezno")]
+    [Range(1, 300, ErrorMessage = "Trajanje mora biti između 1 i 300 minuta")]
     [JsonPropertyName("durationMinutes")]
     public int DurationMinutes { get; set; }
 
+    [StringLength(500, ErrorMessage = "Putanja do audio datoteke ne smije biti duža od 500 znakova")]
     [JsonPropertyName("audioFilePath")]
     public string AudioFilePath { get; set; } = string.Empty;
 
+    [StringLength(100, ErrorMessage = "Fokus ne smije biti duži od 100 znakova")]
     [JsonPropertyName("focusArea")]
     public string FocusArea { get; set; } = "Opća svjesnost"; // "Mirovanje", "Emocije", itd
 
+    [Range(1, 10, ErrorMessage = "Razina smirenja mora biti između 1 i 10")]
     [JsonPropertyName("stressReliefScore")]
     public int StressReliefScore { get; set; } // 1-10
 
+    [Range(1, 10, ErrorMessage = "Jasnoća uma mora biti između 1 i 10")]
     [JsonPropertyName("mentalClarity")]
     public int MentalClarity { get; set; } // 1-10
 
+    [StringLength(500, ErrorMessage = "Bilješke ne smiju biti duže od 500 znakova")]
     [JsonPropertyName("notes")]
     public string Notes { get; set; } = string.Empty;
 
@@ -270,12 +288,15 @@ public class DailyJournal : Activity
     [JsonPropertyName("accomplishments")]
     public List<string> Accomplishments { get; set; } = new();
 
+    [StringLength(2000, ErrorMessage = "Refleksija ne smije biti duža od 2000 znakova")]
     [JsonPropertyName("reflection")]
     public string Reflection { get; set; } = string.Empty;
 
+    [Range(1, 10, ErrorMessage = "Raspoloženje mora biti između 1 i 10")]
     [JsonPropertyName("mood")]
     public int Mood { get; set; } // 1-10 scale
 
+    [Range(1, 10, ErrorMessage = "Razina energije mora biti između 1 i 10")]
     [JsonPropertyName("energyLevel")]
     public int EnergyLevel { get; set; } // 1-10 scale
 
