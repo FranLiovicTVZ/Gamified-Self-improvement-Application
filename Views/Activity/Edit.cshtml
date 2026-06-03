@@ -205,12 +205,56 @@
                     <a asp-action="Details" asp-controller="Activity" asp-route-id="@Model.Id" class="btn btn-secondary">← Nazad</a>
                 </div>
             </form>
+
+            <!-- Priložena Datoteka -->
+            <div class="mt-5">
+                @{
+                    ViewBag.ActivityId = Model.Id;
+                    await Html.RenderPartialAsync("_AttachmentUpload");
+                }
+            </div>
+
         </div>
     </div>
 </div>
 
 @section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
+ 
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script type="text/javascript">
+        Dropzone.options.attachmentDz = {
+            maxFilesize: 10,
+            acceptedFiles: '.pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.zip',
+            success: function () {
+                loadAttachments();
+            }
+        };
+
+        $(function () {
+            loadAttachments();
+        });
+
+        function loadAttachments() {
+            $("#attachmentList").load("@Url.Action("GetAttachments", "Activity", new { activityId = Model.Id })");
+        }
+
+        function deleteAttachment(id) {
+            $.ajax({
+                url: "@Url.Action("DeleteAttachment", "Activity")",
+                method: "POST",
+                data: { id: id },
+                success: function () {
+                    loadAttachments();
+                },
+                error: function () {
+                    alert('Greška pri brisanju datoteke');
+                }
+            });
+        }
+    </script>
 }

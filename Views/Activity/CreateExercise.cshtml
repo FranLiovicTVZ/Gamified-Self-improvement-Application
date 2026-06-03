@@ -15,15 +15,23 @@
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label asp-for="UserId" class="form-label">👤 Korisnik</label>
-                        <select asp-for="UserId" class="form-control" required>
-                            <option value="">-- Odaberi Korisnika --</option>
-                            @foreach (var user in ViewBag.Users)
-                            {
-                                <option value="@user.Id">@user.Username (@user.Level. nivo)</option>
-                            }
-                        </select>
-                        <span asp-validation-for="UserId" class="text-danger"></span>
+                        <label class="form-label">👤 Korisnik</label>
+                        @if (ViewBag.IsOwnActivity == true)
+                        {
+                            <input type="hidden" name="UserId" value="@ViewBag.CurrentLegacyUserId" />
+                            <input class="form-control" value="@(ViewBag.Users.Count > 0 ? ViewBag.Users[0].Username : "Ja")" disabled />
+                        }
+                        else
+                        {
+                            <select asp-for="UserId" class="form-control" required>
+                                <option value="">-- Odaberi Korisnika --</option>
+                                @foreach (var user in ViewBag.Users)
+                                {
+                                    <option value="@user.Id">@user.Username (@user.Level. nivo)</option>
+                                }
+                            </select>
+                            <span asp-validation-for="UserId" class="text-danger"></span>
+                        }
                     </div>
 
                     <div class="col-md-6 mb-3">

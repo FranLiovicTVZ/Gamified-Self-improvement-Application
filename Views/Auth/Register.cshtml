@@ -1,0 +1,66 @@
+@model GamefiedSelfImprovement.Controllers.RegisterViewModel
+@{
+    ViewData["Title"] = "Registracija";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h1 class="text-center mb-4">📝 Registracija</h1>
+
+                    <form asp-action="Register" asp-controller="Auth" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Email" class="form-control" />
+                            <label asp-for="Email"></label>
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="UserName" class="form-control" />
+                            <label asp-for="UserName"></label>
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="OIB" class="form-control" />
+                            <label asp-for="OIB"></label>
+                            <span asp-validation-for="OIB" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="JMBG" class="form-control" />
+                            <label asp-for="JMBG"></label>
+                            <span asp-validation-for="JMBG" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Password" class="form-control" />
+                            <label asp-for="Password"></label>
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="ConfirmPassword" class="form-control" />
+                            <label asp-for="ConfirmPassword"></label>
+                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Registriraj se</button>
+                    </form>
+
+                    <p class="text-center mt-3 mb-0">
+                        Već imaš račun? <a asp-action="Login" asp-controller="Auth">Prijavi se</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

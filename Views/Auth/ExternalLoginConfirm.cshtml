@@ -1,0 +1,51 @@
+@model GamefiedSelfImprovement.Controllers.ExternalLoginConfirmViewModel
+@{
+    ViewData["Title"] = "Dovrši registraciju";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h1 class="text-center mb-4">Dovrši registraciju</h1>
+                    <p class="text-muted">Vanjska prijava uspješna. Unesi OIB i JMBG za dovršetak profila.</p>
+
+                    <form asp-action="ExternalLoginConfirm" asp-controller="Auth" method="post">
+                        <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Email" class="form-control" readonly />
+                            <label asp-for="Email"></label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="UserName" class="form-control" />
+                            <label asp-for="UserName"></label>
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="OIB" class="form-control" />
+                            <label asp-for="OIB"></label>
+                            <span asp-validation-for="OIB" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="JMBG" class="form-control" />
+                            <label asp-for="JMBG"></label>
+                            <span asp-validation-for="JMBG" class="text-danger"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Spremi i nastavi</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

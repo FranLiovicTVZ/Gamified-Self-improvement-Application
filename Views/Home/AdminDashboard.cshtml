@@ -1,0 +1,93 @@
+@model Gamified_Self_Improvement.Models.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="dashboard-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-1">🛡️ Admin Dashboard</h1>
+            <p class="text-muted mb-0">Pregled cijelog sustava</p>
+        </div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+        <a asp-controller="User" asp-action="Index" class="btn btn-outline-primary">👥 Upravljaj korisnicima</a>
+        <a asp-controller="Activity" asp-action="Index" class="btn btn-outline-success">⚡ Upravljaj aktivnostima</a>
+        <a asp-controller="Activity" asp-action="CreateExercise" class="btn btn-outline-secondary">💪 Nova vježba</a>
+    </div>
+    </div>
+
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <h3>👤 Registrirani (Identity)</h3>
+            <p class="stat-number">@Model.TotalAppUsers</p>
+        </div>
+        <div class="stat-card">
+            <h3>👥 Legacy korisnici</h3>
+            <p class="stat-number">@Model.TotalLegacyUsers</p>
+        </div>
+        <div class="stat-card">
+            <h3>⚡ Aktivnosti</h3>
+            <p class="stat-number">@Model.TotalActivities</p>
+        </div>
+    </div>
+
+    @if (Model.TopAppUser != null)
+    {
+        <div class="recent-section mt-4">
+            <h2>🏆 Top korisnik</h2>
+            <div class="user-card">
+                <strong>@Model.TopAppUser.UserName</strong> — Level @Model.TopAppUser.Level, @Model.TopAppUser.TotalXP XP
+            </div>
+        </div>
+    }
+
+    <div class="recent-section mt-4">
+        <h2>👤 Svi registrirani korisnici</h2>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Korisničko ime</th>
+                        <th>Email</th>
+                        <th>Level</th>
+                        <th>XP</th>
+                        <th>Registracija</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var u in Model.AppUsers)
+                    {
+                        <tr>
+                            <td>@u.UserName</td>
+                            <td>@u.Email</td>
+                            <td>@u.Level</td>
+                            <td>@u.TotalXP</td>
+                            <td>@u.CreatedDate.ToString("dd.MM.yyyy.")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="recent-section mt-4">
+        <h2>🔥 Nedavne aktivnosti (sustav)</h2>
+        @if (Model.RecentActivities.Any())
+        {
+            <ul class="activity-list">
+                @foreach (var activity in Model.RecentActivities)
+                {
+                    <li class="activity-item">
+                        <strong>@activity.Title</strong>
+                        <span class="activity-type">@activity.ActivityType</span>
+                        <span class="activity-xp">@activity.CompletedDate.ToString("dd.MM.yyyy.")</span>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p class="text-muted">Nema aktivnosti.</p>
+        }
+    </div>
+</div>

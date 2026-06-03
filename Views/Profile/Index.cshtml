@@ -1,0 +1,156 @@
+@using GamefiedSelfImprovement
+@using GamefiedSelfImprovement.DTOs
+@model GamefiedSelfImprovement.AppUser
+
+@{
+    ViewData["Title"] = $"Profil - {Model.UserName}";
+}
+
+@if (TempData["ProfileMessage"] != null)
+{
+    <div class="alert alert-success container mt-3">@TempData["ProfileMessage"]</div>
+}
+
+<div class="profile-container">
+    <div class="profile-header">
+        <div class="profile-header-content">
+            <div class="profile-info">
+                <h1 class="profile-title">@Model.UserName</h1>
+                <p class="profile-meta"><i class="fas fa-envelope"></i> @Model.Email</p>
+                <p class="profile-meta"><i class="fas fa-calendar-alt"></i> Član od @Model.CreatedDate.ToString("d. MMMM yyyy.")</p>
+            </div>
+            <div class="profile-stats">
+                <div class="stat-badge">
+                    <span class="stat-number">⭐ @Model.Level</span>
+                    <span class="stat-label">Level</span>
+                </div>
+                <div class="stat-badge">
+                    <span class="stat-number">⚡ @Model.TotalXP</span>
+                    <span class="stat-label">XP</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="profile-grid">
+        <div class="profile-section streak-section">
+            @await Html.PartialAsync("_StreakDisplay")
+        </div>
+
+        <div class="profile-section">
+            <h3>📊 Progress</h3>
+            <div class="xp-info">
+                <div class="xp-detail">
+                    <strong>Trenutni XP:</strong>
+                    <span class="xp-value">@Model.TotalXP</span>
+                </div>
+                <div class="xp-detail">
+                    <strong>Za sljedeći level:</strong>
+                    <span class="xp-needed">@(1000 - (Model.TotalXP % 1000)) XP</span>
+                </div>
+            </div>
+            <div class="progress-bar-custom">
+                <div class="progress-fill-custom" style="width: @((Model.TotalXP % 1000) / 10)%;"></div>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <h3>ℹ️ Informacije</h3>
+            <ul class="info-list">
+                <li><strong>OIB:</strong><span>@(string.IsNullOrEmpty(Model.OIB) ? "—" : Model.OIB.Substring(0, Math.Min(6, Model.OIB.Length)) + "****")</span></li>
+                <li><strong>Nivo:</strong><span>@Model.Level</span></li>
+                <li><strong>Preferirani tip meditacije:</strong><span>@Model.PreferredMeditationType</span></li>
+                <li><strong>Aktivnih dana:</strong><span>@Model.StreakDays</span></li>
+                <li><strong>Zadnja aktivnost:</strong><span>@Model.LastActiveDate.ToString("d. MMMM yyyy. u HH:mm")</span></li>
+            </ul>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.Bio))
+        {
+            <div class="profile-section">
+                <h3>📝 O meni</h3>
+                <p class="bio-text">@Model.Bio</p>
+            </div>
+        }
+
+        @if (ViewBag.Activities != null && ((IEnumerable<Activity>)ViewBag.Activities).Any())
+        {
+            <div class="profile-section profile-section-wide">
+                <h3>⚡ Nedavne aktivnosti</h3>
+                <div class="activities-list">
+                    @foreach (Activity act in (IEnumerable<Activity>)ViewBag.Activities)
+                    {
+                        var emoji = act.ActivityType == ActivityType.Exercise ? "💪"
+                            : act.ActivityType == ActivityType.Meditation ? "🧘" : "📖";
+                        <div class="activity-item">
+                            <div class="activity-icon">@emoji</div>
+                            <div class="activity-details">
+                                <strong>@act.Title</strong>
+                                <small>@act.ActivityType — @act.CompletedDate.ToString("d. MMM. yyyy.")</small>
+                            </div>
+                            <div class="activity-xp">+@act.CalculateXP() XP</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+    @{
+        var currentUser = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (currentUser == Model.Id)
+        {
+            <div class="profile-actions">
+                <a asp-action="Edit" asp-controller="Profile" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Uredi profil
+                </a>
+            </div>
+        }
+    }
+</div>
+
+<style>
+    .profile-container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+
+    .profile-header {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(79, 70, 229, 0.25);
+    }
+
+    .profile-header, .profile-header * { color: #ffffff; }
+
+    .profile-title { margin: 0 0 0.5rem; font-size: 2rem; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+    .profile-meta { margin: 0.25rem 0; opacity: 1; font-size: 1rem; }
+
+    .profile-header-content { display: flex; justify-content: space-between; align-items: flex-start; gap: 2rem; flex-wrap: wrap; }
+    .profile-stats { display: flex; gap: 1rem; }
+    .stat-badge { background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px; text-align: center; min-width: 100px; border: 1px solid rgba(255,255,255,0.35); }
+    .stat-number { display: block; font-size: 1.5rem; font-weight: 700; }
+    .stat-label { display: block; font-size: 0.85rem; text-transform: uppercase; }
+
+    .profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    .profile-section-wide { grid-column: 1 / -1; }
+    .profile-section { background: #ffffff; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #e5e7eb; }
+    .profile-section h3 { margin: 0 0 1rem; font-size: 1.2rem; color: #111827; border-bottom: 2px solid #f3f4f6; padding-bottom: 0.75rem; }
+
+    .xp-detail { display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: #374151; }
+    .xp-value, .xp-needed { color: #4f46e5; font-weight: 700; }
+    .progress-bar-custom { background: #f3f4f6; height: 12px; border-radius: 999px; overflow: hidden; }
+    .progress-fill-custom { background: #4f46e5; height: 100%; border-radius: 999px; }
+
+    .info-list { list-style: none; padding: 0; margin: 0; }
+    .info-list li { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #f3f4f6; color: #374151; }
+    .info-list strong { color: #6b7280; }
+    .bio-text { color: #374151; line-height: 1.6; margin: 0; }
+
+    .activities-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .activity-item { display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #f9fafb; border-radius: 8px; border-left: 4px solid #4f46e5; }
+    .activity-details strong { display: block; color: #111827; }
+    .activity-details small { color: #6b7280; }
+    .activity-xp { color: #059669; font-weight: 700; }
+
+    .profile-actions { display: flex; justify-content: center; margin-top: 1rem; }
+</style>

@@ -1,20 +1,93 @@
 ﻿using GamefiedSelfImprovement;
 using Gamified_Self_Improvement.Repositories;
+using Gamified_Self_Improvement.Services;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+if (builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Logging.ClearProviders();
+    builder.Logging.AddConsole();
+    builder.Services.AddDataProtection()
+        .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(Path.GetTempPath(), "GamifiedSelfImprovementTestKeys")));
+}
+
 // Add services to the container
 builder.Services.AddControllersWithViews();
 
-// Configure DbContext for Entity Framework
-builder.Services.AddDbContext<GamefiedSelfImprovementDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("GamefiedSelfImprovementDbContext")));
+// Configure DbContext for Entity Framework with Identity support
+if (builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Services.AddDbContext<GamefiedSelfImprovementDbContext>(options =>
+        options.UseInMemoryDatabase("GamifiedSelfImprovementTests")
+            .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning)));
+}
+else
+{
+    builder.Services.AddDbContext<GamefiedSelfImprovementDbContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("GamefiedSelfImprovementDbContext"))
+            .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning)));
+}
 
-// Register EF Repositories for Dependency Injection
+// Configure Identity with AppUser and roles
+builder.Services
+    .AddIdentity<AppUser, IdentityRole>(options =>
+    {
+        options.SignIn.RequireConfirmedAccount = false;
+        options.Password.RequireDigit = false;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireLowercase = false;
+        options.Password.RequiredLength = 5;
+    })
+    .AddEntityFrameworkStores<GamefiedSelfImprovementDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/auth/login";
+    options.LogoutPath = "/auth/logout";
+    options.AccessDeniedPath = "/auth/login";
+});
+
+var authSection = builder.Configuration.GetSection("Authentication");
+var googleClientId = authSection["Google:ClientId"];
+var googleClientSecret = authSection["Google:ClientSecret"];
+var facebookAppId = authSection["Facebook:AppId"];
+var facebookAppSecret = authSection["Facebook:AppSecret"];
+
+// Configure OAuth authentication (SignInScheme mora biti External za Identity)
+var authBuilder = builder.Services.AddAuthentication();
+if (IsConfigured(googleClientId) && IsConfigured(googleClientSecret))
+{
+    authBuilder.AddGoogle(options =>
+    {
+        options.ClientId = googleClientId!;
+        options.ClientSecret = googleClientSecret!;
+        options.SignInScheme = IdentityConstants.ExternalScheme;
+        options.CallbackPath = "/signin-google";
+    });
+}
+
+if (IsConfigured(facebookAppId) && IsConfigured(facebookAppSecret))
+{
+    authBuilder.AddFacebook(options =>
+    {
+        options.AppId = facebookAppId!;
+        options.AppSecret = facebookAppSecret!;
+        options.SignInScheme = IdentityConstants.ExternalScheme;
+        options.CallbackPath = "/signin-facebook";
+    });
+}
+
+// Register EF Repositories and services
+builder.Services.AddScoped<UserSyncService>();
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<ActivityRepository>();
 
@@ -22,6 +95,9 @@ builder.Services.AddScoped<ActivityRepository>();
 builder.Services.AddSingleton<UserMockRepository>();
 builder.Services.AddSingleton<ActivityMockRepository>();
 builder.Services.AddSingleton<GameDatabase>();
+
+// Add Razor Pages support
+builder.Services.AddRazorPages();
 
 // Configure localization for date time formatting (hr-HR and en-US)
 var supportedCultures = new[]
@@ -31,6 +107,64 @@ var supportedCultures = new[]
 };
 
 var app = builder.Build();
+
+// Test okruženje: InMemory baza i uloge
+if (app.Environment.IsEnvironment("Testing"))
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<GamefiedSelfImprovementDbContext>();
+        await db.Database.EnsureCreatedAsync();
+
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        await SeedRolesAsync(roleManager);
+
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+        await SeedAdminUserAsync(userManager);
+    }
+}
+
+// Apply migrations and seed data at startup (except in Testing environment)
+if (!app.Environment.IsEnvironment("Testing"))
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<GamefiedSelfImprovementDbContext>();
+        
+        // Apply migrations automatically
+        try
+        {
+            await db.Database.MigrateAsync();
+            Console.WriteLine("Database migrations applied successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Migration error: {ex.Message}");
+        }
+        
+        // Seed roles and admin user
+        try
+        {
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+            
+            await SeedRolesAsync(roleManager);
+            await SeedAdminUserAsync(userManager);
+
+            var userSync = scope.ServiceProvider.GetRequiredService<UserSyncService>();
+            var admin = await userManager.FindByEmailAsync("admin@gamified.hr");
+            if (admin != null)
+            {
+                await userSync.SyncFromAppUserAsync(admin);
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log seeding errors but don't crash
+            Console.WriteLine($"Seeding error: {ex.Message}");
+        }
+    }
+}
 
 // Configure request localization
 app.UseRequestLocalization(new RequestLocalizationOptions
@@ -50,10 +184,73 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+
+// Add Authentication and Authorization middleware
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Dashboard}/{id?}");
 
+app.MapRazorPages();
+
 app.Run();
+
+// Seed roles
+async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
+{
+    string[] roles = { "Admin", "Manager", "User" };
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+}
+
+// Seed admin user
+async Task SeedAdminUserAsync(UserManager<AppUser> userManager)
+{
+    var adminUser = await userManager.FindByEmailAsync("admin@gamified.hr");
+    if (adminUser == null)
+    {
+        var user = new AppUser
+        {
+            UserName = "admin",
+            Email = "admin@gamified.hr",
+            OIB = "12345678901",
+            JMBG = "1234567890123",
+            EmailConfirmed = true
+        };
+        var result = await userManager.CreateAsync(user, "Admin123");
+        if (result.Succeeded)
+            await userManager.AddToRoleAsync(user, "Admin");
+    }
+
+    var gmailAdmin = await userManager.FindByEmailAsync("admin@gmail.com");
+    if (gmailAdmin == null)
+    {
+        var user = new AppUser
+        {
+            UserName = "admin_gmail",
+            Email = "admin@gmail.com",
+            OIB = "12345678902",
+            JMBG = "1234567890124",
+            EmailConfirmed = true
+        };
+        var result = await userManager.CreateAsync(user, "admin");
+        if (result.Succeeded)
+            await userManager.AddToRoleAsync(user, "Admin");
+    }
+}
+
+static bool IsConfigured(string? value)
+{
+    return !string.IsNullOrWhiteSpace(value) &&
+           !value.StartsWith("YOUR_", StringComparison.OrdinalIgnoreCase);
+}
+
+public partial class Program { }

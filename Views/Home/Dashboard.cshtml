@@ -1,119 +1,26 @@
-@model Gamified_Self_Improvement.Models.DashboardViewModel
-
 @{
-    ViewData["Title"] = "Activity Dashboard";
+    ViewData["Title"] = "Dashboard";
 }
 
 <div class="dashboard-container">
-    <h1 style="margin-bottom: 0.5rem;">📊 Gamification Dashboard</h1>
-    <p class="page-subtitle">Your self-improvement journey at a glance</p>
-    
-    <!-- Statistics Cards -->
-    <div class="dashboard-stats">
-        <div class="stat-card">
-            <h3>👥 Ukupno korisnika</h3>
-            <p class="stat-number">@Model.TotalUsers</p>
-            <p style="color: var(--text-light); font-size: 0.9rem;">Active members</p>
-        </div>
-        
-        <div class="stat-card">
-            <h3>⚡ Aktivnosti</h3>
-            <p class="stat-number">@Model.TotalActivities</p>
-            <p style="color: var(--text-light); font-size: 0.9rem;">Completed tasks</p>
-        </div>
-        
-        @if (Model.TopUser != null)
-        {
-            <div class="stat-card highlight">
-                <h3>🏆 Top Korisnik</h3>
-                <p class="stat-name" style="font-size: 1.25rem; font-weight: 700; margin: 0.5rem 0;">@Model.TopUser.Username</p>
-                <div style="margin: 0.5rem 0;">
-                    <span class="level-badge">Level @Model.TopUser.Level</span>
-                </div>
-                <p class="stat-xp" style="font-size: 1rem;">@Model.TopUser.TotalXP XP</p>
-                
-                <!-- XP Progress Bar -->
-                <div class="xp-bar-container" style="margin-top: 0.75rem;">
-                    @{
-                        var xpPercentage = Math.Min((@Model.TopUser.TotalXP % 1000) / 10, 100);
-                    }
-                    <div class="xp-bar" style="width: @xpPercentage%;">
-                        <span class="xp-text">@((int)xpPercentage)%</span>
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
-
-    <!-- Recent Activities Section -->
     <div class="recent-section">
-        <h2>🔥 Nedavne Aktivnosti</h2>
-        
-        @if (Model.RecentActivities.Any())
+        <h1>Dashboard</h1>
+        <p class="text-muted">Prijavljeni korisnici se automatski preusmjeravaju na svoj dashboard, a admini na admin dashboard.</p>
+
+        @if (User.Identity?.IsAuthenticated ?? false)
         {
-            <ul class="activity-list">
-                @foreach (var activity in Model.RecentActivities.Take(6))
-                {
-                    var activityClass = activity.ActivityType == GamefiedSelfImprovement.ActivityType.Exercise ? "exercise" 
-                        : activity.ActivityType == GamefiedSelfImprovement.ActivityType.Meditation ? "meditation" : "spiritual";
-                    var activityEmoji = activity.ActivityType == GamefiedSelfImprovement.ActivityType.Exercise ? "💪" 
-                        : activity.ActivityType == GamefiedSelfImprovement.ActivityType.Meditation ? "🧘" : "📖";
-                    
-                    <li class="activity-item">
-                        <span class="activity-icon">@activityEmoji</span>
-                        <div class="activity-info">
-                            <strong>@activity.Title</strong>
-                            <span class="activity-type">@activity.ActivityType</span>
-                        </div>
-                        <span class="activity-xp">+@activity.CalculateXP() XP</span>
-                    </li>
-                }
-            </ul>
+            if (User.IsInRole("Admin"))
+            {
+                <a asp-controller="Home" asp-action="AdminDashboard" class="btn btn-primary">Admin dashboard</a>
+            }
+            else
+            {
+                <a asp-controller="Home" asp-action="UserDashboard" class="btn btn-primary">Moj dashboard</a>
+            }
         }
         else
         {
-            <p class="no-data">Nema nedavnih aktivnosti.</p>
+            <a asp-controller="Auth" asp-action="Login" class="btn btn-primary">Prijava</a>
         }
-    </div>
-
-    <!-- Users Showcase Section -->
-    <div class="users-section">
-        <h2>👥 Najbolji Korisnici</h2>
-        <div class="users-grid">
-            @foreach (var user in Model.Users.OrderByDescending(u => u.TotalXP).Take(6))
-            {
-                <div class="user-card">
-                    <div class="user-header">
-                        <div>
-                            <h3 style="margin-bottom: 0.3rem;">@user.Username</h3>
-                            <p style="color: var(--text-light); font-size: 0.9rem;">@(user.Activities?.Count ?? 0) activities</p>
-                        </div>
-                        <span class="level-badge">Level @user.Level</span>
-                    </div>
-                    
-                    <div style="margin: 1rem 0; padding: 0.75rem; background: var(--neutral-light); border-radius: 8px; border-left: 4px solid var(--accent);">
-                        <p style="margin: 0; font-size: 0.9rem; color: var(--text-light);">Total Experience</p>
-                        <p style="margin: 0.3rem 0 0 0; font-size: 1.4rem; font-weight: 700; color: var(--primary);">@user.TotalXP XP</p>
-                    </div>
-                    
-                    <!-- XP Progress Visualization -->
-                    <div class="xp-bar-container" style="margin: 0.75rem 0;">
-                        @{
-                            var userXpPercentage = Math.Min((user.TotalXP % 1000) / 10, 100);
-                        }
-                        <div class="xp-bar" style="width: @userXpPercentage%;">
-                            @if (userXpPercentage > 15)
-                            {
-                                <span class="xp-text">@((int)userXpPercentage)%</span>
-                            }
-                        </div>
-                    </div>
-                    
-                    <div class="user-actions">
-                        <a asp-controller="User" asp-action="Details" asp-route-id="@user.Id" class="btn btn-primary" style="flex: 1;">View Profile</a>
-                    </div>
-                </div>
-            }
-        </div>
     </div>
 </div>

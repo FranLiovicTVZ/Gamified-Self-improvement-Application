@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/journal-styles.css" asp-append-version="true" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <!-- Custom Navigation Navbar -->
@@ -22,15 +23,54 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Home" asp-action="Dashboard">📊 Dashboard</a>
-                    </li>
+                    @if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="AdminDashboard">🛡️ Admin</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="UserDashboard">📊 Moj dashboard</a>
+                            </li>
+                        }
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Dashboard">📊 Dashboard</a>
+                        </li>
+                    }
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="User" asp-action="Index">👥 Korisnici</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="Activity" asp-action="Index">⚡ Aktivnosti</a>
                     </li>
+                    @if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Profile" asp-action="Index">👤 Moj Profil</a>
+                        </li>
+                        <li class="nav-item">
+                            <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="nav-link btn btn-link border-0">🚪 Odjava</button>
+                            </form>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Auth" asp-action="Login">🔐 Prijava</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Auth" asp-action="Register">📝 Registracija</a>
+                        </li>
+                    }
                 </ul>
             </div>
         </div>

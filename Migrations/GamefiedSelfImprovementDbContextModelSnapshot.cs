@@ -35,13 +35,18 @@ namespace Gamified_Self_Improvement.Migrations
                         .HasColumnType("int")
                         .HasJsonPropertyName("activityType");
 
+                    b.Property<string>("AppUserId")
+                        .HasColumnType("nvarchar(450)")
+                        .HasJsonPropertyName("appUserId");
+
                     b.Property<DateTime>("CompletedDate")
                         .HasColumnType("datetime2")
                         .HasJsonPropertyName("completedDate");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)")
                         .HasJsonPropertyName("description");
 
                     b.Property<int>("Difficulty")
@@ -55,10 +60,11 @@ namespace Gamified_Self_Improvement.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
                         .HasJsonPropertyName("title");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int")
                         .HasJsonPropertyName("userId");
 
@@ -68,6 +74,8 @@ namespace Gamified_Self_Improvement.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AppUserId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Activities");
@@ -76,7 +84,187 @@ namespace Gamified_Self_Improvement.Migrations
 
                     b
                         .UseTphMappingStrategy()
-                        .HasAnnotation("Relational:JsonPropertyName", "activities");
+                        .HasAnnotation("Relational:JsonPropertyName", "activity");
+                });
+
+            modelBuilder.Entity("GamefiedSelfImprovement.AppUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Bio")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasJsonPropertyName("bio");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2")
+                        .HasJsonPropertyName("createdDate");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.PrimitiveCollection<string>("FavoriteBooks")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasJsonPropertyName("favoriteBooks");
+
+                    b.Property<string>("JMBG")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)")
+                        .HasJsonPropertyName("jmbg");
+
+                    b.Property<DateTime>("LastActiveDate")
+                        .HasColumnType("datetime2")
+                        .HasJsonPropertyName("lastActiveDate");
+
+                    b.Property<int>("Level")
+                        .HasColumnType("int")
+                        .HasJsonPropertyName("level");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("OIB")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)")
+                        .HasJsonPropertyName("oib");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PreferredMeditationType")
+                        .HasColumnType("int")
+                        .HasJsonPropertyName("preferredMeditationType");
+
+                    b.Property<string>("ProfileImagePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasJsonPropertyName("profileImagePath");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StreakDays")
+                        .HasColumnType("int")
+                        .HasJsonPropertyName("streakDays");
+
+                    b.Property<int>("TotalXP")
+                        .HasColumnType("int")
+                        .HasJsonPropertyName("totalXP");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasAnnotation("Relational:JsonPropertyName", "user");
+                });
+
+            modelBuilder.Entity("GamefiedSelfImprovement.Attachment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasJsonPropertyName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("ActivityId")
+                        .HasColumnType("int")
+                        .HasJsonPropertyName("activityId");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasJsonPropertyName("contentType");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasJsonPropertyName("description");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)")
+                        .HasJsonPropertyName("fileName");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasJsonPropertyName("filePath");
+
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint")
+                        .HasJsonPropertyName("fileSize");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasJsonPropertyName("isDeleted");
+
+                    b.Property<DateTime>("UploadedDate")
+                        .HasColumnType("datetime2")
+                        .HasJsonPropertyName("uploadedDate");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)")
+                        .HasJsonPropertyName("userId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActivityId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Attachments");
                 });
 
             modelBuilder.Entity("GamefiedSelfImprovement.SpiritualBook", b =>
@@ -170,6 +358,56 @@ namespace Gamified_Self_Improvement.Migrations
                         });
                 });
 
+            modelBuilder.Entity("GamefiedSelfImprovement.Streak", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasJsonPropertyName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2")
+                        .HasJsonPropertyName("createdDate");
+
+                    b.Property<int>("CurrentStreak")
+                        .HasColumnType("int")
+                        .HasJsonPropertyName("currentStreak");
+
+                    b.Property<DateTime?>("LastActivityDate")
+                        .HasColumnType("datetime2")
+                        .HasJsonPropertyName("lastActivityDate");
+
+                    b.Property<DateTime?>("LastStreakResetDate")
+                        .HasColumnType("datetime2")
+                        .HasJsonPropertyName("lastStreakResetDate");
+
+                    b.Property<int>("LongestStreak")
+                        .HasColumnType("int")
+                        .HasJsonPropertyName("longestStreak");
+
+                    b.Property<int>("TotalActivitiesCompleted")
+                        .HasColumnType("int")
+                        .HasJsonPropertyName("totalActivitiesCompleted");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2")
+                        .HasJsonPropertyName("updatedDate");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)")
+                        .HasJsonPropertyName("userId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Streaks");
+                });
+
             modelBuilder.Entity("GamefiedSelfImprovement.TrainingLog", b =>
                 {
                     b.Property<int>("Id")
@@ -237,7 +475,8 @@ namespace Gamified_Self_Improvement.Migrations
 
                     b.Property<string>("Bio")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
                         .HasJsonPropertyName("bio");
 
                     b.Property<DateTime>("CreatedDate")
@@ -281,7 +520,8 @@ namespace Gamified_Self_Improvement.Migrations
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
                         .HasJsonPropertyName("username");
 
                     b.HasKey("Id");
@@ -296,7 +536,7 @@ namespace Gamified_Self_Improvement.Migrations
                             CreatedDate = new DateTime(2026, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "ivan@example.com",
                             FavoriteBooks = "[]",
-                            LastActiveDate = new DateTime(2026, 5, 1, 19, 24, 39, 280, DateTimeKind.Local).AddTicks(8457),
+                            LastActiveDate = new DateTime(2026, 6, 2, 12, 21, 21, 443, DateTimeKind.Local).AddTicks(4218),
                             Level = 5,
                             PreferredMeditationType = 3,
                             ProfileImagePath = "",
@@ -311,7 +551,7 @@ namespace Gamified_Self_Improvement.Migrations
                             CreatedDate = new DateTime(2026, 4, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "marija@example.com",
                             FavoriteBooks = "[]",
-                            LastActiveDate = new DateTime(2026, 5, 1, 19, 24, 39, 281, DateTimeKind.Local).AddTicks(4230),
+                            LastActiveDate = new DateTime(2026, 6, 2, 12, 21, 21, 443, DateTimeKind.Local).AddTicks(7678),
                             Level = 3,
                             PreferredMeditationType = 1,
                             ProfileImagePath = "",
@@ -326,7 +566,7 @@ namespace Gamified_Self_Improvement.Migrations
                             CreatedDate = new DateTime(2026, 3, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "petar@example.com",
                             FavoriteBooks = "[]",
-                            LastActiveDate = new DateTime(2026, 5, 1, 19, 24, 39, 281, DateTimeKind.Local).AddTicks(4238),
+                            LastActiveDate = new DateTime(2026, 6, 2, 12, 21, 21, 443, DateTimeKind.Local).AddTicks(7684),
                             Level = 7,
                             PreferredMeditationType = 4,
                             ProfileImagePath = "",
@@ -419,6 +659,139 @@ namespace Gamified_Self_Improvement.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", (string)null);
+                });
+
             modelBuilder.Entity("GamefiedSelfImprovement.DailyJournal", b =>
                 {
                     b.HasBaseType("GamefiedSelfImprovement.Activity");
@@ -432,6 +805,9 @@ namespace Gamified_Self_Improvement.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasJsonPropertyName("ambitions");
+
+                    b.Property<string>("AppUserId1")
+                        .HasColumnType("nvarchar(450)");
 
                     b.PrimitiveCollection<string>("Challenges")
                         .IsRequired()
@@ -457,11 +833,14 @@ namespace Gamified_Self_Improvement.Migrations
 
                     b.Property<string>("Reflection")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)")
                         .HasJsonPropertyName("reflection");
 
                     b.Property<int?>("UserId1")
                         .HasColumnType("int");
+
+                    b.HasIndex("AppUserId1");
 
                     b.HasIndex("UserId1");
 
@@ -485,7 +864,7 @@ namespace Gamified_Self_Improvement.Migrations
                             Challenges = "[]",
                             DailyGoals = "[]",
                             EnergyLevel = 8,
-                            JournalDate = new DateTime(2026, 5, 1, 19, 24, 39, 284, DateTimeKind.Local).AddTicks(2439),
+                            JournalDate = new DateTime(2026, 6, 2, 12, 21, 21, 446, DateTimeKind.Local).AddTicks(1059),
                             Mood = 8,
                             Reflection = ""
                         });
@@ -509,7 +888,8 @@ namespace Gamified_Self_Improvement.Migrations
 
                     b.Property<string>("Location")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
                         .HasJsonPropertyName("location");
 
                     b.PrimitiveCollection<string>("MuscleGroups")
@@ -578,7 +958,8 @@ namespace Gamified_Self_Improvement.Migrations
 
                     b.Property<string>("AudioFilePath")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
                         .HasJsonPropertyName("audioFilePath");
 
                     b.Property<int>("DurationMinutes")
@@ -587,7 +968,8 @@ namespace Gamified_Self_Improvement.Migrations
 
                     b.Property<string>("FocusArea")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
                         .HasJsonPropertyName("focusArea");
 
                     b.Property<int>("MeditationType")
@@ -600,7 +982,8 @@ namespace Gamified_Self_Improvement.Migrations
 
                     b.Property<string>("Notes")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
                         .HasJsonPropertyName("notes");
 
                     b.Property<int>("StressReliefScore")
@@ -620,7 +1003,7 @@ namespace Gamified_Self_Improvement.Migrations
                         {
                             Id = 3,
                             ActivityType = 2,
-                            CompletedDate = new DateTime(2026, 5, 1, 19, 24, 39, 283, DateTimeKind.Local).AddTicks(9049),
+                            CompletedDate = new DateTime(2026, 6, 2, 12, 21, 21, 445, DateTimeKind.Local).AddTicks(7511),
                             Description = "10 minuta mindfulness meditacije",
                             Difficulty = 1,
                             Title = "Ujutna meditacija",
@@ -638,7 +1021,7 @@ namespace Gamified_Self_Improvement.Migrations
                         {
                             Id = 4,
                             ActivityType = 2,
-                            CompletedDate = new DateTime(2026, 5, 1, 19, 24, 39, 284, DateTimeKind.Local).AddTicks(1139),
+                            CompletedDate = new DateTime(2026, 6, 2, 12, 21, 21, 445, DateTimeKind.Local).AddTicks(9699),
                             Description = "15 minuta dišanja",
                             Difficulty = 1,
                             Title = "Večernja meditacija",
@@ -703,17 +1086,102 @@ namespace Gamified_Self_Improvement.Migrations
 
             modelBuilder.Entity("GamefiedSelfImprovement.Activity", b =>
                 {
+                    b.HasOne("GamefiedSelfImprovement.AppUser", "AppUser")
+                        .WithMany("Activities")
+                        .HasForeignKey("AppUserId");
+
                     b.HasOne("GamefiedSelfImprovement.User", "User")
                         .WithMany("Activities")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("AppUser");
 
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("GamefiedSelfImprovement.Attachment", b =>
+                {
+                    b.HasOne("GamefiedSelfImprovement.Activity", "Activity")
+                        .WithMany()
+                        .HasForeignKey("ActivityId");
+
+                    b.HasOne("GamefiedSelfImprovement.AppUser", "User")
+                        .WithMany("Attachments")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Activity");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("GamefiedSelfImprovement.Streak", b =>
+                {
+                    b.HasOne("GamefiedSelfImprovement.AppUser", "AppUser")
+                        .WithOne("Streak")
+                        .HasForeignKey("GamefiedSelfImprovement.Streak", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AppUser");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.HasOne("GamefiedSelfImprovement.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.HasOne("GamefiedSelfImprovement.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GamefiedSelfImprovement.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.HasOne("GamefiedSelfImprovement.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("GamefiedSelfImprovement.DailyJournal", b =>
                 {
+                    b.HasOne("GamefiedSelfImprovement.AppUser", null)
+                        .WithMany("Journals")
+                        .HasForeignKey("AppUserId1");
+
                     b.HasOne("GamefiedSelfImprovement.User", null)
                         .WithMany("Journals")
                         .HasForeignKey("UserId1");
@@ -728,6 +1196,17 @@ namespace Gamified_Self_Improvement.Migrations
                         .IsRequired();
 
                     b.Navigation("Book");
+                });
+
+            modelBuilder.Entity("GamefiedSelfImprovement.AppUser", b =>
+                {
+                    b.Navigation("Activities");
+
+                    b.Navigation("Attachments");
+
+                    b.Navigation("Journals");
+
+                    b.Navigation("Streak");
                 });
 
             modelBuilder.Entity("GamefiedSelfImprovement.User", b =>

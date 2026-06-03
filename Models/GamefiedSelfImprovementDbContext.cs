@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 
@@ -5,8 +6,9 @@ namespace GamefiedSelfImprovement;
 
 /// <summary>
 /// DbContext klasa za Entity Framework - predstavlja bazu podataka
+/// Nasljeđuje IdentityDbContext za Identity podrška
 /// </summary>
-public class GamefiedSelfImprovementDbContext : DbContext
+public class GamefiedSelfImprovementDbContext : IdentityDbContext<AppUser>
 {
     public GamefiedSelfImprovementDbContext(DbContextOptions<GamefiedSelfImprovementDbContext> options) 
         : base(options)
@@ -14,7 +16,7 @@ public class GamefiedSelfImprovementDbContext : DbContext
     }
 
     // DbSet za sve entitete koji će biti tablice u bazi
-    public DbSet<User> Users { get; set; }
+    public new DbSet<User> Users { get; set; }
     public DbSet<Activity> Activities { get; set; }
     public DbSet<Exercise> Exercises { get; set; }
     public DbSet<SpiritualActivity> SpiritualActivities { get; set; }
@@ -23,6 +25,8 @@ public class GamefiedSelfImprovementDbContext : DbContext
     public DbSet<SpiritualBook> SpiritualBooks { get; set; }
     public DbSet<XPReward> XPRewards { get; set; }
     public DbSet<TrainingLog> TrainingLogs { get; set; }
+    public DbSet<Attachment> Attachments { get; set; }
+    public DbSet<Streak> Streaks { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -1,0 +1,62 @@
+@model GamefiedSelfImprovement.DTOs.LoginDTO
+@{
+    ViewData["Title"] = "Prijava";
+    var returnUrl = ViewBag.ReturnUrl as string ?? "/";
+    var oauthConfigured = ViewBag.OAuthConfigured as bool? ?? false;
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h1 class="text-center mb-4">🔐 Prijava</h1>
+
+                    @if (TempData["AuthError"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["AuthError"]</div>
+                    }
+
+                    <form asp-action="Login" asp-controller="Auth" method="post">
+                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Email" class="form-control" />
+                            <label asp-for="Email">Email</label>
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Password" class="form-control" />
+                            <label asp-for="Password">Lozinka</label>
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Prijavi se</button>
+                    </form>
+
+                    @{ ViewBag.ReturnUrl = returnUrl; }
+                    @if (oauthConfigured)
+                    {
+                        @await Html.PartialAsync("_OAuthLoginButtons")
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning mt-3 mb-0 small">
+                            Google/Facebook prijava nije konfigurirana. Postavi kredencijale u <code>appsettings.json</code> ili user secrets.
+                        </div>
+                    }
+
+                    <p class="text-center mt-3 mb-0">
+                        Nemaš račun? <a asp-action="Register" asp-controller="Auth">Registriraj se</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

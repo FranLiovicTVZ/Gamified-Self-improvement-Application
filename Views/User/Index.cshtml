@@ -11,9 +11,12 @@
                 <h1>👥 Korisnici</h1>
                 <p class="page-subtitle">Pogledaj sve registrirane korisnike i njihov napredak</p>
             </div>
-            <a asp-controller="User" asp-action="Create" class="btn btn-success" style="height: fit-content; font-size: 1rem; padding: 0.75rem 1.5rem;">
-                ➕ Dodaj Korisnika
-            </a>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-controller="User" asp-action="Create" class="btn btn-success" style="height: fit-content; font-size: 1rem; padding: 0.75rem 1.5rem;">
+                    ➕ Dodaj Korisnika
+                </a>
+            }
         </div>
 
         <!-- Search Bar -->

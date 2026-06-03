@@ -53,7 +53,7 @@ public class SpiritualBook
 }
 
 /// <summary>
-/// Bazna klasa za sve aktivnosti
+/// Bazna klasa za sve aktivnosti - client side validacija
 /// </summary>
 public abstract class Activity
 {
@@ -61,9 +61,16 @@ public abstract class Activity
     [JsonPropertyName("id")]
     public int Id { get; set; }
 
+    [ForeignKey("AppUser")]
+    [JsonPropertyName("appUserId")]
+    public string? AppUserId { get; set; }
+
+    public virtual AppUser? AppUser { get; set; }
+
+    // Zadržavam za backward compatibility sa starim User modelom
     [ForeignKey("User")]
     [JsonPropertyName("userId")]
-    public int UserId { get; set; }
+    public int? UserId { get; set; }
 
     public virtual User? User { get; set; }
 
@@ -94,6 +101,13 @@ public abstract class Activity
     public Activity(int userId, string title, ActivityType type)
     {
         UserId = userId;
+        Title = title;
+        ActivityType = type;
+    }
+
+    public Activity(string appUserId, string title, ActivityType type)
+    {
+        AppUserId = appUserId;
         Title = title;
         ActivityType = type;
     }

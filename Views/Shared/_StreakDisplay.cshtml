@@ -1,0 +1,109 @@
+@using GamefiedSelfImprovement.DTOs
+
+@{
+    var streak = ViewBag.Streak as StreakDTO;
+
+    if (streak == null)
+    {
+        <div class="alert alert-info mb-0">Nema streak podataka.</div>
+        return;
+    }
+}
+
+<div class="streak-card-light">
+    <div class="streak-header-light">
+        <h3 class="streak-title-light">🔥 Moj streak</h3>
+        <div class="streak-badges-light">
+            <span class="badge bg-danger">@streak.CurrentStreak dana</span>
+            <span class="badge bg-warning text-dark">Rekord: @streak.LongestStreak</span>
+        </div>
+    </div>
+
+    <div class="streak-grid-light">
+        <div class="streak-stat-light">
+            <span class="label">Trenutni streak</span>
+            <span class="value">@streak.CurrentStreak <small>dana</small></span>
+        </div>
+        <div class="streak-stat-light">
+            <span class="label">Najduži streak</span>
+            <span class="value gold">@streak.LongestStreak <small>dana</small></span>
+        </div>
+        <div class="streak-stat-light">
+            <span class="label">Ukupno aktivnosti</span>
+            <span class="value green">@streak.TotalActivitiesCompleted</span>
+        </div>
+    </div>
+
+    @if (streak.LastActivityDate.HasValue)
+    {
+        <p class="streak-footer-light mb-0">Zadnja aktivnost: @streak.LastActivityDate.Value.ToString("d. MMMM yyyy. u HH:mm")</p>
+    }
+</div>
+
+<style>
+    .streak-card-light {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.25rem;
+        color: #111827;
+    }
+
+    .streak-header-light {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .streak-title-light {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #111827 !important;
+    }
+
+    .streak-badges-light { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+    .streak-grid-light {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .streak-stat-light {
+        background: #f9fafb;
+        border-radius: 8px;
+        padding: 0.75rem;
+        border-left: 4px solid #4f46e5;
+    }
+
+    .streak-stat-light .label {
+        display: block;
+        font-size: 0.8rem;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        margin-bottom: 0.25rem;
+    }
+
+    .streak-stat-light .value {
+        display: block;
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .streak-stat-light .value.gold { color: #b45309; }
+    .streak-stat-light .value.green { color: #059669; }
+
+    .streak-footer-light {
+        font-size: 0.9rem;
+        color: #6b7280;
+    }
+</style>

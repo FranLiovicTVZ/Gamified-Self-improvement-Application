@@ -1,5 +1,6 @@
 using Gamified_Self_Improvement.Repositories;
 using GamefiedSelfImprovement;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gamified_Self_Improvement.Controllers;
@@ -49,6 +50,7 @@ public class UserController : Controller
     /// </summary>
     [Route("dodaj")]
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     public IActionResult Create()
     {
         return View();
@@ -60,6 +62,7 @@ public class UserController : Controller
     /// </summary>
     [Route("dodaj")]
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public IActionResult Create(User user)
     {
         if (!ModelState.IsValid)
@@ -83,6 +86,7 @@ public class UserController : Controller
     /// </summary>
     [Route("uredi/{id:int}")]
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     public IActionResult Edit(int id)
     {
         var user = _userRepository.GetById(id);
@@ -98,6 +102,7 @@ public class UserController : Controller
     /// </summary>
     [Route("uredi/{id:int}")]
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ActionName("Edit")]
     public IActionResult EditPost(int id, User user)
     {
@@ -133,6 +138,7 @@ public class UserController : Controller
     /// </summary>
     [Route("obrisi/{id:int}")]
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     public IActionResult Delete(int id)
     {
         var user = _userRepository.GetById(id);
@@ -148,6 +154,7 @@ public class UserController : Controller
     /// </summary>
     [Route("obrisi/{id:int}")]
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ActionName("Delete")]
     public IActionResult DeletePost(int id)
     {

@@ -1,0 +1,55 @@
+@{
+    var returnUrl = ViewBag.ReturnUrl ?? "/";
+}
+
+<div class="oauth-divider mt-4 mb-4">
+    <span>ili se prijavi preko:</span>
+</div>
+
+<div class="oauth-buttons d-grid gap-2">
+    @if (ViewBag.GoogleConfigured == true)
+    {
+        <a class="btn btn-outline-danger w-100"
+           asp-controller="Auth"
+           asp-action="ExternalLogin"
+           asp-route-provider="Google"
+           asp-route-returnUrl="@returnUrl">
+            <i class="fab fa-google"></i> Prijavi se sa Google-om
+        </a>
+    }
+
+    @if (ViewBag.FacebookConfigured == true)
+    {
+        <a class="btn btn-primary w-100"
+           asp-controller="Auth"
+           asp-action="ExternalLogin"
+           asp-route-provider="Facebook"
+           asp-route-returnUrl="@returnUrl">
+            <i class="fab fa-facebook-f"></i> Prijavi se sa Facebook-om
+        </a>
+    }
+</div>
+
+<style>
+    .oauth-divider {
+        text-align: center;
+        position: relative;
+    }
+
+    .oauth-divider span {
+        background: white;
+        padding: 0 10px;
+        color: #999;
+        font-size: 0.9em;
+    }
+
+    .oauth-divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        border-top: 1px solid #ddd;
+        z-index: -1;
+    }
+</style>

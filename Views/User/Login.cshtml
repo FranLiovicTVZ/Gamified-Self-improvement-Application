@@ -1,0 +1,113 @@
+@{
+    ViewData["Title"] = "Prijava";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h1 class="mb-0">🎮 Prijava</h1>
+                    <p class="text-light mb-0">Gamified Self Improvement</p>
+                </div>
+
+                <div class="card-body p-4">
+                    <!-- Klasična prijava -->
+                    <form method="post" action="/api/auth/login">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">📧 Email</label>
+                            <input type="email" id="email" name="email" class="form-control" required placeholder="tvoj@email.com">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">🔐 Lozinka</label>
+                            <input type="password" id="password" name="password" class="form-control" required placeholder="Upiši lozinku">
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" id="rememberMe" name="rememberMe" class="form-check-input">
+                            <label class="form-check-label" for="rememberMe">
+                                Zapamti me
+                            </label>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                ✅ Prijavi Se
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Razdjelnica -->
+                    <div class="mt-4 mb-4" style="border-top: 1px solid #dee2e6; padding-top: 1.5rem;">
+                        <p class="text-center text-muted mb-3">ili koristi:</p>
+                    </div>
+
+                    <!-- OAuth Prijava -->
+                    <div class="d-grid gap-2 mb-3">
+                        <form method="post" action="/api/auth/external-login" class="d-grid">
+                            <input type="hidden" name="provider" value="Google" />
+                            <button type="submit" class="btn btn-outline-danger">
+                                <i class="fab fa-google"></i> Google
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <form method="post" action="/api/auth/external-login" class="d-grid">
+                            <input type="hidden" name="provider" value="Facebook" />
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fab fa-facebook-f"></i> Facebook
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Registracija -->
+                    <div class="mt-4 text-center">
+                        <p class="text-muted">
+                            Nemaš račun?
+                            <a asp-action="Register" asp-controller="User" class="text-primary fw-bold">Registriraj Se</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 10px;
+    }
+
+    .card-header {
+        border-radius: 10px 10px 0 0;
+        padding: 2rem 1rem !important;
+    }
+
+    .btn-outline-danger:hover {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+
+    i {
+        margin-right: 0.5rem;
+    }
+</style>

@@ -1,0 +1,20 @@
+@{
+    int activityId = ViewBag.ActivityId ?? 0;
+}
+
+<div class="card mt-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">📎 Dokumenti</h5>
+    </div>
+    <div class="card-body">
+        <p class="text-muted small">Maksimalna veličina: 10MB</p>
+        <form id="attachmentDz"
+              asp-controller="Activity"
+              asp-action="UploadAttachment"
+              asp-route-activityId="@activityId"
+              enctype="multipart/form-data"
+              class="dropzone">
+        </form>
+        <div id="attachmentList"></div>
+    </div>
+</div>

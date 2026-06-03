@@ -1,0 +1,60 @@
+@model Gamified_Self_Improvement.Models.UserDashboardViewModel
+@{
+    ViewData["Title"] = "Moj Dashboard";
+}
+
+<div class="dashboard-container">
+    <h1 class="mb-1">👋 Bok, @Model.User.UserName!</h1>
+    <p class="text-muted mb-4">Tvoj osobni pregled napretka</p>
+
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <h3>⭐ Level</h3>
+            <p class="stat-number">@Model.User.Level</p>
+        </div>
+        <div class="stat-card">
+            <h3>⚡ XP</h3>
+            <p class="stat-number">@Model.User.TotalXP</p>
+        </div>
+        <div class="stat-card">
+            <h3>🔥 Streak</h3>
+            <p class="stat-number">@(Model.Streak?.CurrentStreak ?? 0)</p>
+        </div>
+    </div>
+
+    <div class="row mt-4 g-3">
+        <div class="col-md-4">
+            <a asp-controller="Profile" asp-action="Index" class="btn btn-primary w-100">👤 Moj profil</a>
+        </div>
+        <div class="col-md-4">
+            <a asp-controller="Activity" asp-action="Index" class="btn btn-outline-primary w-100">⚡ Aktivnosti</a>
+        </div>
+        <div class="col-md-4">
+            <a asp-controller="Profile" asp-action="Edit" class="btn btn-outline-secondary w-100">✏️ Uredi profil</a>
+        </div>
+    </div>
+
+    <div class="recent-section mt-4">
+        <h2>🔥 Moje nedavne aktivnosti</h2>
+        @if (Model.RecentActivities.Any())
+        {
+            <ul class="activity-list">
+                @foreach (var activity in Model.RecentActivities)
+                {
+                    var emoji = activity.ActivityType == GamefiedSelfImprovement.ActivityType.Exercise ? "💪"
+                        : activity.ActivityType == GamefiedSelfImprovement.ActivityType.Meditation ? "🧘" : "📖";
+                    <li class="activity-item">
+                        <span>@emoji</span>
+                        <strong>@activity.Title</strong>
+                        <span class="activity-type">@activity.ActivityType</span>
+                        <span class="activity-xp">+@activity.CalculateXP() XP</span>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p class="text-muted">Još nemaš zabilježenih aktivnosti. Kreiraj prvu!</p>
+        }
+    </div>
+</div>
