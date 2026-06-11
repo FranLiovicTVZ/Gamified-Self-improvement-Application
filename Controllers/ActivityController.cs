@@ -76,7 +76,7 @@ public class ActivityController : BaseController
         return _userRepository.GetAll().FirstOrDefault(u => u.Email == appUser.Email);
     }
 
-    private async Task UpdateUserProgressAsync(int xpEarned)
+    private async Task UpdateUserProgressAsync(int xpEarned, ActivityType activityType)
     {
         var appUser = await UserManager.GetUserAsync(User);
         if (appUser == null) return;
@@ -84,6 +84,13 @@ public class ActivityController : BaseController
         appUser.TotalXP += xpEarned;
         appUser.Level = Math.Min(100, appUser.TotalXP / 100 + 1);
         appUser.LastActiveDate = DateTime.UtcNow;
+
+        switch (activityType)
+        {
+            case ActivityType.Exercise:   appUser.ExerciseXP  += xpEarned; break;
+            case ActivityType.Meditation: appUser.MeditationXP += xpEarned; break;
+            case ActivityType.Journal:    appUser.JournalXP   += xpEarned; break;
+        }
 
         var streak = await _dbContext.Streaks.FirstOrDefaultAsync(s => s.UserId == appUser.Id);
         if (streak == null)
@@ -186,7 +193,7 @@ public class ActivityController : BaseController
             var user = exercise.UserId.HasValue ? _userRepository.GetById(exercise.UserId.Value) : null;
             if (user != null) { user.TotalXP += exercise.XpReward; _userRepository.Update(user); }
 
-            await UpdateUserProgressAsync(exercise.XpReward);
+            await UpdateUserProgressAsync(exercise.XpReward, ActivityType.Exercise);
             return RedirectToAction("Index");
         }
         catch (Exception ex)
@@ -237,7 +244,7 @@ public class ActivityController : BaseController
             var user = meditation.UserId.HasValue ? _userRepository.GetById(meditation.UserId.Value) : null;
             if (user != null) { user.TotalXP += meditation.XpReward; _userRepository.Update(user); }
 
-            await UpdateUserProgressAsync(meditation.XpReward);
+            await UpdateUserProgressAsync(meditation.XpReward, ActivityType.Meditation);
             return RedirectToAction("Index");
         }
         catch (Exception ex)
@@ -288,7 +295,7 @@ public class ActivityController : BaseController
             var user = journal.UserId.HasValue ? _userRepository.GetById(journal.UserId.Value) : null;
             if (user != null) { user.TotalXP += journal.XpReward; _userRepository.Update(user); }
 
-            await UpdateUserProgressAsync(journal.XpReward);
+            await UpdateUserProgressAsync(journal.XpReward, ActivityType.Journal);
             return RedirectToAction("Index");
         }
         catch (Exception ex)

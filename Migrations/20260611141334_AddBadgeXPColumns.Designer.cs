@@ -4,6 +4,7 @@ using GamefiedSelfImprovement;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Gamified_Self_Improvement.Migrations
 {
     [DbContext(typeof(GamefiedSelfImprovementDbContext))]
-    partial class GamefiedSelfImprovementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260611141334_AddBadgeXPColumns")]
+    partial class AddBadgeXPColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

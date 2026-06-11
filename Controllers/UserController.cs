@@ -1,7 +1,10 @@
 using Gamified_Self_Improvement.Repositories;
+using Gamified_Self_Improvement.Services;
 using GamefiedSelfImprovement;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Gamified_Self_Improvement.Controllers;
 
@@ -12,20 +15,39 @@ namespace Gamified_Self_Improvement.Controllers;
 public class UserController : Controller
 {
     private readonly UserRepository _userRepository;
+    private readonly UserManager<AppUser> _userManager;
+    private readonly GamefiedSelfImprovementDbContext _dbContext;
 
-    public UserController(UserRepository userRepository)
+    public UserController(
+        UserRepository userRepository,
+        UserManager<AppUser> userManager,
+        GamefiedSelfImprovementDbContext dbContext)
     {
         _userRepository = userRepository;
+        _userManager = userManager;
+        _dbContext = dbContext;
+    }
+
+    private async Task<HashSet<string>> GetAdminEmailsAsync()
+    {
+        var admins = await _userManager.GetUsersInRoleAsync("Admin");
+        return admins
+            .Where(a => a.Email != null)
+            .Select(a => a.Email!)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
     }
 
     /// <summary>
-    /// Lista svih korisnika
+    /// Lista svih korisnika — admini su skriveni
     /// URL: /korisnici
     /// </summary>
     [Route("")]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var users = _userRepository.GetAll();
+        var adminEmails = await GetAdminEmailsAsync();
+        var users = _userRepository.GetAll()
+            .Where(u => !adminEmails.Contains(u.Email))
+            .ToList();
         return View(users);
     }
 
@@ -35,11 +57,20 @@ public class UserController : Controller
     /// </summary>
     [Route("{id:int}")]
     [Route("/profil/{id:int}")]
-    public IActionResult Details(int id)
+    public async Task<IActionResult> Details(int id)
     {
         var user = _userRepository.GetById(id);
         if (user == null)
             return NotFound();
+
+        var exerciseXP  = user.Activities.OfType<Exercise>().Sum(a => a.XpReward);
+        var meditationXP = user.Activities.OfType<Meditation>().Sum(a => a.XpReward);
+        var journalXP   = user.Journals.Sum(j => j.XpReward);
+        var streakDays  = user.StreakDays;
+
+        ViewBag.ExerciseBadge   = BadgeCalculator.Calculate(exerciseXP, streakDays);
+        ViewBag.MeditationBadge = BadgeCalculator.Calculate(meditationXP, streakDays);
+        ViewBag.JournalBadge    = BadgeCalculator.Calculate(journalXP, streakDays);
 
         return View(user);
     }
@@ -115,7 +146,6 @@ public class UserController : Controller
 
         try
         {
-            // Ažuriraj samo dopuštena polja
             existingUser.Username = user.Username;
             existingUser.Email = user.Email;
             existingUser.Bio = user.Bio;
@@ -175,23 +205,26 @@ public class UserController : Controller
     }
 
     /// <summary>
-    /// AJAX pretraga korisnika
+    /// AJAX pretraga korisnika — admini su isključeni iz rezultata
     /// URL: /korisnici/pretraga?q=search_term
     /// </summary>
     [Route("pretraga")]
     [HttpGet]
-    public IActionResult Search(string q)
+    public async Task<IActionResult> Search(string q)
     {
         if (string.IsNullOrWhiteSpace(q))
             return Json(new List<object>());
 
+        var adminEmails = await GetAdminEmailsAsync();
         var searchQuery = q.ToLower();
+
         var results = _userRepository.GetAll()
-            .Where(u => u.Username.ToLower().Contains(searchQuery) || 
-                        u.Email.ToLower().Contains(searchQuery))
+            .Where(u => !adminEmails.Contains(u.Email) &&
+                        (u.Username.ToLower().Contains(searchQuery) ||
+                         u.Email.ToLower().Contains(searchQuery)))
             .Take(10)
-            .Select(u => new { 
-                id = u.Id, 
+            .Select(u => new {
+                id = u.Id,
                 username = u.Username,
                 email = u.Email,
                 level = u.Level,

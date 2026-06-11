@@ -1,4 +1,5 @@
 @model Gamified_Self_Improvement.Models.UserDashboardViewModel
+@using Gamified_Self_Improvement.Services
 @{
     ViewData["Title"] = "Moj Dashboard";
 }
@@ -19,6 +20,35 @@
         <div class="stat-card">
             <h3>🔥 Streak</h3>
             <p class="stat-number">@(Model.Streak?.CurrentStreak ?? 0)</p>
+        </div>
+    </div>
+
+    <!-- Bedževi -->
+    <div class="mt-4">
+        <h2>🎖 Moji Bedževi</h2>
+        <p class="text-muted" style="font-size:0.85rem; margin-bottom:1rem;">
+            Temelje se na XP-u po aktivnosti uz eksponencijalni bonus za redovitost — jedan propušteni dan resetira streak.
+        </p>
+        <div style="display:flex; gap:1.25rem; flex-wrap:wrap;">
+            @{
+                var badges = new[]
+                {
+                    new { Label = "Vježbanje 💪", Tier = Model.ExerciseBadge },
+                    new { Label = "Meditacija 🧘", Tier = Model.MeditationBadge },
+                    new { Label = "Dnevnik 📓", Tier = Model.JournalBadge }
+                };
+            }
+            @foreach (var b in badges)
+            {
+                var color = BadgeCalculator.GetColor(b.Tier);
+                var emoji = BadgeCalculator.GetEmoji(b.Tier);
+                var label = BadgeCalculator.GetLabel(b.Tier);
+                <div style="border:2px solid @color; border-radius:12px; padding:1rem 1.4rem; min-width:140px; text-align:center;">
+                    <div style="font-size:2rem;">@(b.Tier == GamefiedSelfImprovement.BadgeTier.None ? "🔒" : emoji)</div>
+                    <div style="font-weight:700; color:@color; font-size:1rem; margin-top:0.25rem;">@label</div>
+                    <div style="font-size:0.8rem; color:#666; margin-top:0.15rem;">@b.Label</div>
+                </div>
+            }
         </div>
     </div>
 

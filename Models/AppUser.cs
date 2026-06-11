@@ -53,6 +53,15 @@ public class AppUser : IdentityUser
     [JsonPropertyName("lastActiveDate")]
     public DateTime LastActiveDate { get; set; } = DateTime.UtcNow;
 
+    [JsonPropertyName("exerciseXP")]
+    public int ExerciseXP { get; set; } = 0;
+
+    [JsonPropertyName("meditationXP")]
+    public int MeditationXP { get; set; } = 0;
+
+    [JsonPropertyName("journalXP")]
+    public int JournalXP { get; set; } = 0;
+
     // Navigacijska svojstva
     public virtual ICollection<Activity> Activities { get; set; } = new List<Activity>();
     public virtual ICollection<DailyJournal> Journals { get; set; } = new List<DailyJournal>();

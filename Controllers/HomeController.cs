@@ -1,5 +1,6 @@
 using Gamified_Self_Improvement.Models;
 using Gamified_Self_Improvement.Repositories;
+using Gamified_Self_Improvement.Services;
 using GamefiedSelfImprovement;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -103,14 +104,63 @@ public class HomeController : Controller
             .Take(6)
             .ToListAsync();
 
+        var streakDays = streak?.CurrentStreak ?? 0;
         var model = new UserDashboardViewModel
         {
             User = user,
             Streak = streak,
             RecentActivities = activities,
-            TotalActivities = await userActivitiesQuery.CountAsync()
+            TotalActivities = await userActivitiesQuery.CountAsync(),
+            ExerciseBadge   = BadgeCalculator.Calculate(user.ExerciseXP, streakDays),
+            MeditationBadge = BadgeCalculator.Calculate(user.MeditationXP, streakDays),
+            JournalBadge    = BadgeCalculator.Calculate(user.JournalXP, streakDays)
         };
 
         return View(model);
+    }
+
+    /// <summary>
+    /// Leaderboard — svi korisnici poredani po XP-u, trenutni korisnik označen
+    /// </summary>
+    [Route("leaderboard")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Leaderboard()
+    {
+        var adminEmails = await GetAdminEmailsAsync();
+        var allUsers = _userRepository.GetAll()
+            .Where(u => !adminEmails.Contains(u.Email))
+            .OrderByDescending(u => u.TotalXP)
+            .ThenByDescending(u => u.Level)
+            .ToList();
+
+        var currentUserEmail = User.Identity?.IsAuthenticated == true
+            ? (await _userManager.GetUserAsync(User))?.Email
+            : null;
+
+        var entries = allUsers.Select((u, i) => new LeaderboardEntry
+        {
+            Rank          = i + 1,
+            Username      = u.Username,
+            UserId        = u.Id,
+            TotalXP       = u.TotalXP,
+            Level         = u.Level,
+            StreakDays    = u.StreakDays,
+            ExerciseBadge   = BadgeCalculator.Calculate(u.Activities.OfType<Exercise>().Sum(a => a.XpReward), u.StreakDays),
+            MeditationBadge = BadgeCalculator.Calculate(u.Activities.OfType<Meditation>().Sum(a => a.XpReward), u.StreakDays),
+            JournalBadge    = BadgeCalculator.Calculate(u.Journals.Sum(j => j.XpReward), u.StreakDays),
+            IsCurrentUser = currentUserEmail != null &&
+                            u.Email.Equals(currentUserEmail, StringComparison.OrdinalIgnoreCase)
+        }).ToList();
+
+        return View(entries);
+    }
+
+    private async Task<HashSet<string>> GetAdminEmailsAsync()
+    {
+        var admins = await _userManager.GetUsersInRoleAsync("Admin");
+        return admins
+            .Where(a => a.Email != null)
+            .Select(a => a.Email!)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
     }
 }

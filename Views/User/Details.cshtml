@@ -1,7 +1,10 @@
 @model GamefiedSelfImprovement.User
-
+@using Gamified_Self_Improvement.Services
 @{
     ViewData["Title"] = $"Profil - {Model.Username}";
+    var exerciseBadge   = (GamefiedSelfImprovement.BadgeTier)ViewBag.ExerciseBadge;
+    var meditationBadge = (GamefiedSelfImprovement.BadgeTier)ViewBag.MeditationBadge;
+    var journalBadge    = (GamefiedSelfImprovement.BadgeTier)ViewBag.JournalBadge;
 }
 
 <div class="user-details-page">
@@ -32,6 +35,32 @@
                     <span class="xp-text" style="font-size: 0.9rem;">@((int)userXpPercentage)%</span>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Bedževi -->
+    <div style="margin-top:1.75rem;">
+        <h3 style="margin-bottom:0.75rem;">🎖 Bedževi</h3>
+        <div style="display:flex; gap:1.25rem; flex-wrap:wrap;">
+            @{
+                var badges = new[]
+                {
+                    new { Label = "Vježbanje 💪", Tier = exerciseBadge },
+                    new { Label = "Meditacija 🧘", Tier = meditationBadge },
+                    new { Label = "Dnevnik 📓",   Tier = journalBadge }
+                };
+            }
+            @foreach (var b in badges)
+            {
+                var color = BadgeCalculator.GetColor(b.Tier);
+                var emoji = BadgeCalculator.GetEmoji(b.Tier);
+                var label = BadgeCalculator.GetLabel(b.Tier);
+                <div style="border:2px solid @color; border-radius:12px; padding:1rem 1.4rem; min-width:140px; text-align:center;">
+                    <div style="font-size:2rem;">@(b.Tier == GamefiedSelfImprovement.BadgeTier.None ? "🔒" : emoji)</div>
+                    <div style="font-weight:700; color:@color; font-size:1rem; margin-top:0.25rem;">@label</div>
+                    <div style="font-size:0.8rem; color:#666; margin-top:0.15rem;">@b.Label</div>
+                </div>
+            }
         </div>
     </div>
 
@@ -125,9 +154,12 @@
     </div>
 
     <!-- Back to Users Link -->
-    <div style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
-        <a href="@Url.Action("Index", "User")" class="btn btn-primary">← Nazad na sve korisnike</a>
-        <a asp-controller="User" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">✏️ Uredi Profil</a>
-        <a asp-controller="User" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">🗑️ Obrisi Profil</a>
+    <div style="margin-top: 2rem; display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+        <a href="@Url.Action("Index", "User")" class="btn btn-outline-secondary" style="width:auto;">← Korisnici</a>
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-controller="User" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning" style="width:auto;">✏️ Uredi</a>
+            <a asp-controller="User" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger" style="width:auto;">🗑️ Obriši</a>
+        }
     </div>
 </div>

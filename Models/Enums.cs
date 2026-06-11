@@ -56,3 +56,16 @@ public enum DifficultyLevel
     Hard,
     Extreme
 }
+
+/// <summary>
+/// Stupnjevi bedževa za svaku vrstu aktivnosti
+/// </summary>
+public enum BadgeTier
+{
+    None,
+    Bronze,
+    Silver,
+    Gold,
+    Diamond,
+    Champion
+}

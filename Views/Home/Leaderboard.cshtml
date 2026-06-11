@@ -1,0 +1,77 @@
+@model List<Gamified_Self_Improvement.Models.LeaderboardEntry>
+@using Gamified_Self_Improvement.Services
+@{
+    ViewData["Title"] = "Leaderboard";
+}
+
+<div style="max-width:860px; margin:0 auto;">
+    <div style="margin-bottom:1.75rem;">
+        <h1 style="margin-bottom:0.25rem;">🏆 Leaderboard</h1>
+        <p class="text-muted">Poredak korisnika prema ukupnom XP-u</p>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="no-data"><p style="margin:0;">Nema korisnika za prikaz.</p></div>
+    }
+    else
+    {
+        <div style="display:flex; flex-direction:column; gap:0.6rem;">
+            @foreach (var entry in Model)
+            {
+                var rowBg   = entry.IsCurrentUser ? "var(--primary)" : "var(--surface)";
+                var rowColor = entry.IsCurrentUser ? "#fff" : "inherit";
+                var subColor = entry.IsCurrentUser ? "rgba(255,255,255,0.75)" : "var(--text-light)";
+                var rankEmoji = entry.Rank switch { 1 => "🥇", 2 => "🥈", 3 => "🥉", _ => $"#{entry.Rank}" };
+
+                <a href="@Url.Action("Details", "User", new { id = entry.UserId })"
+                   style="display:flex; align-items:center; gap:1rem; padding:0.85rem 1.1rem; border-radius:12px; background:@rowBg; color:@rowColor; text-decoration:none; box-shadow:0 1px 4px rgba(0,0,0,0.07); flex-wrap:wrap;">
+
+                    <!-- Rank -->
+                    <div style="min-width:2.4rem; font-size:1.15rem; font-weight:700; text-align:center;">
+                        @rankEmoji
+                    </div>
+
+                    <!-- Username + streak -->
+                    <div style="flex:1; min-width:120px;">
+                        <div style="font-weight:700; font-size:1rem;">
+                            @entry.Username
+                            @if (entry.IsCurrentUser) { <span style="font-size:0.75rem; opacity:0.85; margin-left:0.4rem;">(ti)</span> }
+                        </div>
+                        @if (entry.StreakDays > 0)
+                        {
+                            <div style="font-size:0.78rem; color:@subColor;">🔥 @entry.StreakDays-dnevni streak</div>
+                        }
+                    </div>
+
+                    <!-- Level + XP -->
+                    <div style="text-align:right; min-width:90px;">
+                        <div style="font-weight:700; font-size:1rem;">⭐ Lv.@entry.Level</div>
+                        <div style="font-size:0.8rem; color:@subColor;">⚡ @entry.TotalXP XP</div>
+                    </div>
+
+                    <!-- Badges -->
+                    <div style="display:flex; gap:0.35rem; align-items:center; flex-wrap:nowrap;">
+                        @{
+                            var actBadges = new[]
+                            {
+                                new { Tier = entry.ExerciseBadge,   Title = "Vježbanje" },
+                                new { Tier = entry.MeditationBadge, Title = "Meditacija" },
+                                new { Tier = entry.JournalBadge,    Title = "Dnevnik" }
+                            };
+                        }
+                        @foreach (var b in actBadges)
+                        {
+                            var bc = BadgeCalculator.GetColor(b.Tier);
+                            var be = BadgeCalculator.GetEmoji(b.Tier);
+                            <span title="@b.Title: @BadgeCalculator.GetLabel(b.Tier)"
+                                  style="display:inline-flex; align-items:center; justify-content:center; width:2rem; height:2rem; border-radius:50%; border:2px solid @bc; background:@(entry.IsCurrentUser ? "rgba(255,255,255,0.15)" : "var(--neutral-light)"); font-size:1rem;">
+                                @(b.Tier == GamefiedSelfImprovement.BadgeTier.None ? "🔒" : be)
+                            </span>
+                        }
+                    </div>
+                </a>
+            }
+        </div>
+    }
+</div>

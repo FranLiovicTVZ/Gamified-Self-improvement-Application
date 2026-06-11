@@ -7,9 +7,12 @@
 }
 
 <div class="activities-page">
-    @if (!string.IsNullOrEmpty(userName))
+    @if (userId != null)
     {
-        <a href="@Url.Action("Details", "User", new { id = userId })" class="btn-profile">← Nazad na @userName</a>
+        <a href="@Url.Action("Details", "User", new { id = userId })"
+           style="display:inline-flex; align-items:center; gap:0.4rem; margin-bottom:1rem; padding:0.4rem 0.9rem; border:1.5px solid var(--primary); border-radius:8px; color:var(--primary); font-weight:600; font-size:0.9rem; text-decoration:none; width:fit-content;">
+            ← @(string.IsNullOrEmpty(userName) ? "Nazad" : userName)
+        </a>
     }
     
     <div style="margin-bottom: 2rem;">
