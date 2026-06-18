@@ -12,15 +12,19 @@
     <link rel="stylesheet" href="~/css/journal-styles.css" asp-append-version="true" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
     <!-- Custom Navigation Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-custom">
+    <nav class="navbar navbar-expand-xl navbar-dark navbar-custom">
         <div class="container-fluid" style="padding: 0 2rem;">
-            <a class="navbar-brand" asp-controller="Home" asp-action="Dashboard">🎮 Gamified Self Improvement</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
+            <a class="navbar-brand" asp-controller="Home" asp-action="Dashboard">
+                <span class="d-none d-xl-inline">🎮 Gamified Self Improvement</span>
+                <span class="d-xl-none">🎮 Gamified improvement</span>
+            </a>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     @if (User.Identity?.IsAuthenticated ?? false)
@@ -51,7 +55,7 @@
                         <a class="nav-link" asp-controller="Activity" asp-action="Index">⚡ Aktivnosti</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Home" asp-action="Leaderboard">🏆 Leaderboard</a>
+                        <a class="nav-link" asp-controller="Home" asp-action="Leaderboard">🏆 Rang-lista</a>
                     </li>
                     @if (User.Identity?.IsAuthenticated ?? false)
                     {
@@ -75,6 +79,15 @@
                         </li>
                     }
                 </ul>
+                <!-- Global Search -->
+                <div class="global-search-wrapper position-relative ms-3">
+                    <div class="global-search-input-wrapper">
+                        <i class="bi bi-search global-search-icon"></i>
+                        <input id="globalSearch" type="search" class="form-control form-control-sm global-search-input"
+                               placeholder="Pretraži..." autocomplete="off" aria-label="Globalna pretraga">
+                    </div>
+                    <div id="searchDropdown" class="search-dropdown shadow d-none"></div>
+                </div>
             </div>
         </div>
     </nav>
@@ -91,9 +104,44 @@
         </div>
     </footer>
 
+    <!-- AI Chatbot Widget -->
+    <div id="ai-chat-wrapper">
+        <div id="ai-chat-panel" role="dialog" aria-labelledby="ai-chat-label" aria-modal="true">
+            <div class="ai-chat-header">
+                <div class="ai-chat-avatar">🧠</div>
+                <div class="ai-chat-title">
+                    <h6 id="ai-chat-label">AI Wellness Asistent</h6>
+                    <small>Meditacija &amp; Vježbanje</small>
+                </div>
+                <button id="ai-chat-close" aria-label="Zatvori chat">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div id="ai-chat-messages">
+                <div class="ai-msg ai-msg-bot">
+                    <div class="ai-bubble">
+                        Zdravo! Ja sam tvoj AI wellness asistent. Pitaj me što god želiš o <strong>meditaciji</strong> ili <strong>vježbanju</strong>! 🧘‍♂️💪
+                    </div>
+                </div>
+            </div>
+            <div id="ai-chat-suggested"></div>
+            <div class="ai-chat-input-area">
+                <textarea id="ai-chat-input" placeholder="Postavi pitanje..." rows="1" aria-label="Poruka"></textarea>
+                <button id="ai-chat-send" aria-label="Pošalji">
+                    <i class="bi bi-send-fill"></i>
+                </button>
+            </div>
+        </div>
+        <button id="ai-chat-toggle" aria-label="Otvori AI asistenta" aria-expanded="false">
+            <i class="bi bi-chat-heart-fill"></i>
+        </button>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/animations.js" asp-append-version="true"></script>
+    <script src="~/js/search.js" asp-append-version="true"></script>
+    <script src="~/js/chatbot.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

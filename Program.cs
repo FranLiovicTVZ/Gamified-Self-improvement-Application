@@ -6,9 +6,26 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Serilog;
+using Serilog.Events;
 using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, loggerConfig) =>
+{
+    loggerConfig
+        .MinimumLevel.Information()
+        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+        .Enrich.FromLogContext()
+        .WriteTo.Console()
+        .WriteTo.File(
+            path: "logs/app-.log",
+            rollingInterval: RollingInterval.Day,
+            retainedFileCountLimit: 30,
+            outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}");
+});
 
 if (builder.Environment.IsEnvironment("Testing"))
 {
@@ -19,13 +36,36 @@ if (builder.Environment.IsEnvironment("Testing"))
 }
 
 // Add services to the container
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+});
+builder.Services.AddHttpClient();
+
+// MCP Server - exposes app data to agentic IDEs (Claude Code, Cursor, etc.)
+builder.Services
+    .AddMcpServer()
+    .WithHttpTransport()
+    .WithTools<GamefiedSelfImprovement.McpTools.ActivityTools>()
+    .WithTools<GamefiedSelfImprovement.McpTools.UserTools>()
+    .WithTools<GamefiedSelfImprovement.McpTools.StreakTools>()
+    .WithTools<GamefiedSelfImprovement.McpTools.SearchTools>()
+    .WithTools<GamefiedSelfImprovement.McpTools.BookTools>();
 
 // Configure DbContext for Entity Framework with Identity support
 if (builder.Environment.IsEnvironment("Testing"))
 {
     builder.Services.AddDbContext<GamefiedSelfImprovementDbContext>(options =>
         options.UseInMemoryDatabase("GamifiedSelfImprovementTests")
+            .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning)));
+}
+else if (builder.Environment.IsProduction())
+{
+    var dbDir = Path.Combine(builder.Environment.ContentRootPath, "data");
+    Directory.CreateDirectory(dbDir);
+    var dbPath = Path.Combine(dbDir, "gamified.db");
+    builder.Services.AddDbContext<GamefiedSelfImprovementDbContext>(options =>
+        options.UseSqlite($"Data Source={dbPath}")
             .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning)));
 }
 else
@@ -194,6 +234,9 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Dashboard}/{id?}");
 
 app.MapRazorPages();
+
+// MCP endpoint — connect Claude Code with: /mcp add gamified http://localhost:5000/mcp/sse
+app.MapMcp("/mcp");
 
 app.Run();
 

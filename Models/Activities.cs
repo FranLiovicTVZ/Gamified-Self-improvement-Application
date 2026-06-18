@@ -249,11 +249,11 @@ public class Meditation : Activity
 
     [Range(1, 10, ErrorMessage = "Razina smirenja mora biti između 1 i 10")]
     [JsonPropertyName("stressReliefScore")]
-    public int StressReliefScore { get; set; } // 1-10
+    public int StressReliefScore { get; set; } = 5; // 1-10
 
     [Range(1, 10, ErrorMessage = "Jasnoća uma mora biti između 1 i 10")]
     [JsonPropertyName("mentalClarity")]
-    public int MentalClarity { get; set; } // 1-10
+    public int MentalClarity { get; set; } = 5; // 1-10
 
     [StringLength(500, ErrorMessage = "Bilješke ne smiju biti duže od 500 znakova")]
     [JsonPropertyName("notes")]

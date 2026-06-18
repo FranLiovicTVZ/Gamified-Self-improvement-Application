@@ -192,7 +192,7 @@
     <!-- Action Buttons -->
     <div class="action-buttons" style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
         <a href="@Url.Action("Index", "Activity", new { userId = Model.UserId })" class="btn btn-secondary">← Sve aktivnosti</a>
-        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+        @if (User.IsInRole("Admin") || User.IsInRole("Manager") || (bool)(ViewBag.IsOwner ?? false))
         {
             <a asp-controller="Activity" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">✏️ Uredi</a>
         }

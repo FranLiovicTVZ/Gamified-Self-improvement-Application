@@ -18,17 +18,20 @@ public class AuthController : Controller
     private readonly SignInManager<AppUser> _signInManager;
     private readonly UserSyncService _userSyncService;
     private readonly IConfiguration _configuration;
+    private readonly ILogger<AuthController> _logger;
 
     public AuthController(
         UserManager<AppUser> userManager,
         SignInManager<AppUser> signInManager,
         UserSyncService userSyncService,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        ILogger<AuthController> logger)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _userSyncService = userSyncService;
         _configuration = configuration;
+        _logger = logger;
     }
 
     [Route("login")]
@@ -58,6 +61,7 @@ public class AuthController : Controller
         var user = await _userManager.FindByEmailAsync(model.Email);
         if (user == null)
         {
+            _logger.LogWarning("Neuspješna prijava — nepoznati email {Email}", model.Email);
             ModelState.AddModelError(string.Empty, "Email ili lozinka nisu ispravni.");
             return View(model);
         }
@@ -67,10 +71,12 @@ public class AuthController : Controller
 
         if (!result.Succeeded)
         {
+            _logger.LogWarning("Neuspješna prijava za korisnika {Email} — razlog: {Reason}", model.Email, result.IsLockedOut ? "zaključan" : "pogrešna lozinka");
             ModelState.AddModelError(string.Empty, "Email ili lozinka nisu ispravni.");
             return View(model);
         }
 
+        _logger.LogInformation("Korisnik {Email} uspješno prijavljen", model.Email);
         return await RedirectAfterLoginAsync(user, returnUrl);
     }
 
@@ -113,6 +119,7 @@ public class AuthController : Controller
         var result = await _userManager.CreateAsync(user, model.Password);
         if (!result.Succeeded)
         {
+            _logger.LogWarning("Neuspješna registracija za {Email}: {Errors}", model.Email, string.Join(", ", result.Errors.Select(e => e.Code)));
             foreach (var error in result.Errors)
             {
                 ModelState.AddModelError(string.Empty, error.Description);
@@ -124,6 +131,7 @@ public class AuthController : Controller
         await _userSyncService.SyncFromAppUserAsync(user);
         await _signInManager.SignInAsync(user, isPersistent: true);
 
+        _logger.LogInformation("Novi korisnik registriran: {Email} ({UserName})", model.Email, model.UserName);
         return await RedirectAfterLoginAsync(user, null);
     }
 
@@ -133,6 +141,7 @@ public class AuthController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
+        _logger.LogInformation("Korisnik {UserId} odjavio se", User.Identity?.Name);
         await _signInManager.SignOutAsync();
         return RedirectToAction(nameof(Login));
     }
@@ -179,6 +188,7 @@ public class AuthController : Controller
             var existing = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
             if (existing != null)
             {
+                _logger.LogInformation("Korisnik {Email} prijavljen putem {Provider}", existing.Email, info.LoginProvider);
                 await _userSyncService.SyncFromAppUserAsync(existing);
                 return await RedirectAfterLoginAsync(existing, returnUrl);
             }

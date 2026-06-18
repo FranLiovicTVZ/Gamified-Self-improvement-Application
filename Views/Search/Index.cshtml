@@ -1,0 +1,98 @@
+@model GamefiedSelfImprovement.DTOs.GlobalSearchResultDTO
+@{
+    ViewData["Title"] = $"Pretraga: {Model.Query}";
+    var grouped = Model.Results.GroupBy(r => r.Category).ToDictionary(g => g.Key, g => g.ToList());
+    var categoryOrder = new[] { "Aktivnost", "Korisnik", "Knjiga" };
+    var categoryIcons = new Dictionary<string, string>
+    {
+        { "Aktivnost", "bi-lightning-charge" },
+        { "Korisnik",  "bi-people" },
+        { "Knjiga",    "bi-book" }
+    };
+}
+
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="mb-1">
+                <i class="bi bi-search me-2"></i>Rezultati pretrage
+            </h2>
+            @if (!string.IsNullOrEmpty(Model.Query))
+            {
+                <p class="text-muted mb-0">
+                    @Model.TotalCount rezultat(a) za „<strong>@Model.Query</strong>"
+                </p>
+            }
+        </div>
+        <div class="col-auto d-flex align-items-start">
+            <form method="get" action="/pretraga" class="d-flex gap-2">
+                <input type="search" name="q" value="@Model.Query" class="form-control"
+                       placeholder="Nova pretraga..." style="min-width:240px;" autofocus>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    @if (string.IsNullOrEmpty(Model.Query) || Model.Query.Length < 2)
+    {
+        <div class="alert alert-info">
+            Upišite najmanje 2 znaka da biste pokrenuli pretragu.
+        </div>
+    }
+    else if (Model.TotalCount == 0)
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-search fs-1 text-muted"></i>
+            <h5 class="mt-3 text-muted">Nema rezultata za „@Model.Query"</h5>
+            <p class="text-muted">Pokušajte s drugim pojmom ili pregledajte sekcije direktno.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var cat in categoryOrder)
+            {
+                @if (!grouped.ContainsKey(cat)) { continue; }
+                var items = grouped[cat];
+                var icon = categoryIcons.GetValueOrDefault(cat, "bi-grid");
+
+                <div class="col-12">
+                    <div class="card search-results-card">
+                        <div class="card-header d-flex align-items-center gap-2">
+                            <i class="bi @icon"></i>
+                            <span class="fw-semibold">@cat</span>
+                            <span class="badge bg-secondary ms-auto">@items.Count</span>
+                        </div>
+                        <div class="list-group list-group-flush">
+                            @foreach (var item in items)
+                            {
+                                <a href="@item.Url" class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-3">
+                                    <i class="bi @item.Icon fs-5 text-primary" style="width:1.5rem;text-align:center;flex-shrink:0;"></i>
+                                    <div class="min-width-0">
+                                        <div class="fw-medium">@item.Title</div>
+                                        @if (!string.IsNullOrEmpty(item.Subtitle))
+                                        {
+                                            <div class="text-muted small">@item.Subtitle</div>
+                                        }
+                                    </div>
+                                    <i class="bi bi-chevron-right ms-auto text-muted"></i>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+<style>
+    .search-results-card { border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.07); }
+    .search-results-card .card-header { background: var(--neutral-light); font-size: .9rem; }
+    .list-group-item:hover .bi-chevron-right { color: var(--secondary) !important; }
+    .min-width-0 { min-width: 0; }
+</style>
+}

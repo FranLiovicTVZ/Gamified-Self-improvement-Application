@@ -17,14 +17,22 @@
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label asp-for="UserId" class="form-label">👤 Korisnik</label>
-                        <select asp-for="UserId" class="form-control" required>
-                            <option value="">-- Odaberi Korisnika --</option>
-                            @foreach (var user in ViewBag.Users ?? new List<User>())
-                            {
-                                <option value="@user.Id" selected="@(user.Id == Model.UserId)">@user.Username (@user.Level. nivo)</option>
-                            }
-                        </select>
+                        <label class="form-label">👤 Korisnik</label>
+                        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                        {
+                            <select asp-for="UserId" class="form-control" required>
+                                <option value="">-- Odaberi Korisnika --</option>
+                                @foreach (var user in ViewBag.Users ?? new List<User>())
+                                {
+                                    <option value="@user.Id" selected="@(user.Id == Model.UserId)">@user.Username (@user.Level. nivo)</option>
+                                }
+                            </select>
+                        }
+                        else
+                        {
+                            <input type="hidden" asp-for="UserId" />
+                            <input class="form-control" value="Ti" disabled />
+                        }
                         <span asp-validation-for="UserId" class="text-danger"></span>
                     </div>
 
@@ -221,21 +229,20 @@
 @section Scripts {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
- 
+
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
     <script type="text/javascript">
-        Dropzone.options.attachmentDz = {
-            maxFilesize: 10,
-            acceptedFiles: '.pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.zip',
-            success: function () {
-                loadAttachments();
-            }
-        };
+        Dropzone.autoDiscover = false;
 
         $(function () {
+            new Dropzone("#attachmentDz", {
+                maxFilesize: 10,
+                acceptedFiles: '.pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.zip',
+                success: function () { loadAttachments(); }
+            });
             loadAttachments();
         });
 
@@ -248,12 +255,8 @@
                 url: "@Url.Action("DeleteAttachment", "Activity")",
                 method: "POST",
                 data: { id: id },
-                success: function () {
-                    loadAttachments();
-                },
-                error: function () {
-                    alert('Greška pri brisanju datoteke');
-                }
+                success: function () { loadAttachments(); },
+                error: function () { alert('Greška pri brisanju datoteke'); }
             });
         }
     </script>

@@ -17,6 +17,7 @@ public class ActivityController : BaseController
     private readonly UserRepository _userRepository;
     private readonly GamefiedSelfImprovementDbContext _dbContext;
     private readonly IWebHostEnvironment _env;
+    private readonly ILogger<ActivityController> _logger;
     private const long MaxFileSize = 10 * 1024 * 1024;
     private static readonly string[] AllowedExtensions = { ".pdf", ".doc", ".docx", ".txt", ".jpg", ".jpeg", ".png", ".gif", ".zip" };
 
@@ -25,13 +26,15 @@ public class ActivityController : BaseController
         UserRepository userRepository,
         UserManager<AppUser> userManager,
         GamefiedSelfImprovementDbContext dbContext,
-        IWebHostEnvironment env)
+        IWebHostEnvironment env,
+        ILogger<ActivityController> logger)
         : base(userManager)
     {
         _activityRepository = activityRepository;
         _userRepository = userRepository;
         _dbContext = dbContext;
         _env = env;
+        _logger = logger;
     }
 
     /// <summary>
@@ -148,6 +151,7 @@ public class ActivityController : BaseController
 
         var user = activity.UserId.HasValue ? _userRepository.GetById(activity.UserId.Value) : null;
         ViewBag.UserName = user?.Username;
+        ViewBag.IsOwner = activity.AppUserId == CurrentUserId;
 
         return View(activity);
     }
@@ -162,7 +166,7 @@ public class ActivityController : BaseController
     public async Task<IActionResult> CreateExercise()
     {
         await SetCreateViewBagAsync();
-        return View();
+        return View(new Exercise());
     }
 
     /// <summary>
@@ -176,6 +180,9 @@ public class ActivityController : BaseController
     public async Task<IActionResult> CreateExercise(Exercise exercise)
     {
         await AssignCurrentUserIfNeededAsync(exercise);
+
+        exercise.Description ??= string.Empty;
+        exercise.Location ??= "Kuća";
 
         if (!ModelState.IsValid)
         {
@@ -194,10 +201,12 @@ public class ActivityController : BaseController
             if (user != null) { user.TotalXP += exercise.XpReward; _userRepository.Update(user); }
 
             await UpdateUserProgressAsync(exercise.XpReward, ActivityType.Exercise);
-            return RedirectToAction("Index");
+            _logger.LogInformation("Korisnik {UserId} kreirao vježbu '{Title}' (XP: {Xp})", CurrentUserId, exercise.Title, exercise.XpReward);
+            return RedirectToAction("Edit", new { id = exercise.Id });
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Greška pri kreiranju vježbe za korisnika {UserId}", CurrentUserId);
             await SetCreateViewBagAsync();
             ModelState.AddModelError("", $"Greška pri dodavanju vježbe: {ex.Message}");
             return View(exercise);
@@ -214,7 +223,7 @@ public class ActivityController : BaseController
     public async Task<IActionResult> CreateMeditation()
     {
         await SetCreateViewBagAsync();
-        return View();
+        return View(new Meditation());
     }
 
     /// <summary>
@@ -227,6 +236,13 @@ public class ActivityController : BaseController
     public async Task<IActionResult> CreateMeditation(Meditation meditation)
     {
         await AssignCurrentUserIfNeededAsync(meditation);
+
+        // ASP.NET Core 8 s nullable annotations konvertira prazne stringove u null;
+        // normaliziramo ih na prazne stringove kako bismo zadovoljili DB NOT NULL constraint.
+        meditation.Description ??= string.Empty;
+        meditation.AudioFilePath ??= string.Empty;
+        meditation.FocusArea ??= "Opća svjesnost";
+        meditation.Notes ??= string.Empty;
 
         if (!ModelState.IsValid)
         {
@@ -245,10 +261,12 @@ public class ActivityController : BaseController
             if (user != null) { user.TotalXP += meditation.XpReward; _userRepository.Update(user); }
 
             await UpdateUserProgressAsync(meditation.XpReward, ActivityType.Meditation);
-            return RedirectToAction("Index");
+            _logger.LogInformation("Korisnik {UserId} kreirao meditaciju '{Title}' (XP: {Xp})", CurrentUserId, meditation.Title, meditation.XpReward);
+            return RedirectToAction("Edit", new { id = meditation.Id });
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Greška pri kreiranju meditacije za korisnika {UserId}", CurrentUserId);
             await SetCreateViewBagAsync();
             ModelState.AddModelError("", $"Greška pri dodavanju meditacije: {ex.Message}");
             return View(meditation);
@@ -265,7 +283,7 @@ public class ActivityController : BaseController
     public async Task<IActionResult> CreateJournal()
     {
         await SetCreateViewBagAsync();
-        return View();
+        return View(new DailyJournal());
     }
 
     /// <summary>
@@ -296,21 +314,28 @@ public class ActivityController : BaseController
             if (user != null) { user.TotalXP += journal.XpReward; _userRepository.Update(user); }
 
             await UpdateUserProgressAsync(journal.XpReward, ActivityType.Journal);
-            return RedirectToAction("Index");
+            _logger.LogInformation("Korisnik {UserId} kreirao dnevnički unos '{Title}' (XP: {Xp})", CurrentUserId, journal.Title, journal.XpReward);
+            return RedirectToAction("Edit", new { id = journal.Id });
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Greška pri kreiranju dnevnika za korisnika {UserId}", CurrentUserId);
             await SetCreateViewBagAsync();
             ModelState.AddModelError("", $"Greška pri dodavanju dnevnika: {ex.Message}");
             return View(journal);
         }
     }
 
+    private bool CanEditActivity(Activity activity) =>
+        activity.AppUserId == CurrentUserId ||
+        User.IsInRole("Admin") ||
+        User.IsInRole("Manager");
+
     /// <summary>
     /// Forma za uređivanje aktivnosti - GET
     /// URL: /aktivnosti/uredi/{id}
     /// </summary>
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize]
     [Route("uredi/{id:int}")]
     [HttpGet]
     public IActionResult Edit(int id)
@@ -319,9 +344,14 @@ public class ActivityController : BaseController
         if (activity == null)
             return NotFound();
 
-        ViewBag.Users = _userRepository.GetAll();
+        if (!CanEditActivity(activity))
+            return Forbid();
+
+        ViewBag.Users = User.IsInRole("Admin") || User.IsInRole("Manager")
+            ? _userRepository.GetAll()
+            : (IEnumerable<User>)new[] { _userRepository.GetAll().FirstOrDefault(u => u.Id == activity.UserId)! }.Where(u => u != null);
         ViewBag.ActivityType = activity.ActivityType.ToString();
-        
+
         return View(activity);
     }
 
@@ -329,66 +359,41 @@ public class ActivityController : BaseController
     /// Spremi uređenu aktivnost - POST
     /// URL: /aktivnosti/uredi/{id}
     /// </summary>
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize]
     [Route("uredi/{id:int}")]
     [HttpPost]
     [ActionName("Edit")]
-    public IActionResult EditPost(int id, Activity activity)
+    public async Task<IActionResult> EditPost(int id)
     {
         var existingActivity = _activityRepository.GetById(id);
         if (existingActivity == null)
             return NotFound();
 
-        if (!ModelState.IsValid)
+        if (!CanEditActivity(existingActivity))
+            return Forbid();
+
+        if (!await TryUpdateModelAsync(existingActivity))
         {
-            ViewBag.Users = _userRepository.GetAll();
+            ViewBag.Users = User.IsInRole("Admin") || User.IsInRole("Manager")
+                ? _userRepository.GetAll()
+                : (IEnumerable<User>)new[] { _userRepository.GetAll().FirstOrDefault(u => u.Id == existingActivity.UserId)! }.Where(u => u != null);
             ViewBag.ActivityType = existingActivity.ActivityType.ToString();
             return View(nameof(Edit), existingActivity);
         }
 
         try
         {
-            // Ažuriraj samo dopuštena polja
-            existingActivity.Title = activity.Title;
-            existingActivity.Description = activity.Description;
-            existingActivity.Difficulty = activity.Difficulty;
-            existingActivity.CompletedDate = activity.CompletedDate;
-
-            // Ažuriraj type-specifična polja
-            if (existingActivity is Exercise exercise && activity is Exercise actExercise)
-            {
-                exercise.DurationMinutes = actExercise.DurationMinutes;
-                exercise.CaloriesBurned = actExercise.CaloriesBurned;
-                exercise.Sets = actExercise.Sets;
-                exercise.Reps = actExercise.Reps;
-                exercise.Weight = actExercise.Weight;
-                exercise.Location = actExercise.Location;
-                exercise.ExerciseType = actExercise.ExerciseType;
-            }
-            else if (existingActivity is Meditation meditation && activity is Meditation actMeditation)
-            {
-                meditation.DurationMinutes = actMeditation.DurationMinutes;
-                meditation.MeditationType = actMeditation.MeditationType;
-                meditation.FocusArea = actMeditation.FocusArea;
-                meditation.StressReliefScore = actMeditation.StressReliefScore;
-                meditation.MentalClarity = actMeditation.MentalClarity;
-                meditation.Notes = actMeditation.Notes;
-            }
-            else if (existingActivity is DailyJournal journal && activity is DailyJournal actJournal)
-            {
-                journal.JournalDate = actJournal.JournalDate;
-                journal.Reflection = actJournal.Reflection;
-                journal.Mood = actJournal.Mood;
-                journal.EnergyLevel = actJournal.EnergyLevel;
-            }
-
             _activityRepository.Update(existingActivity);
+            _logger.LogInformation("Korisnik {UserId} ažurirao aktivnost {ActivityId}", CurrentUserId, id);
             return RedirectToAction("Details", new { id = id });
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Greška pri ažuriranju aktivnosti {ActivityId} za korisnika {UserId}", id, CurrentUserId);
             ModelState.AddModelError("", $"Greška pri ažuriranju aktivnosti: {ex.Message}");
-            ViewBag.Users = _userRepository.GetAll();
+            ViewBag.Users = User.IsInRole("Admin") || User.IsInRole("Manager")
+                ? _userRepository.GetAll()
+                : (IEnumerable<User>)new[] { _userRepository.GetAll().FirstOrDefault(u => u.Id == existingActivity.UserId)! }.Where(u => u != null);
             ViewBag.ActivityType = existingActivity.ActivityType.ToString();
             return View(nameof(Edit), existingActivity);
         }
@@ -435,10 +440,12 @@ public class ActivityController : BaseController
             }
 
             _activityRepository.Delete(id);
+            _logger.LogWarning("Korisnik {UserId} obrisao aktivnost {ActivityId} '{Title}'", CurrentUserId, id, activity.Title);
             return RedirectToAction("Index");
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Greška pri brisanju aktivnosti {ActivityId}", id);
             ModelState.AddModelError("", $"Greška pri brisanju aktivnosti: {ex.Message}");
             return View(nameof(Delete), activity);
         }
@@ -480,7 +487,7 @@ public class ActivityController : BaseController
     /// <summary>
     /// AJAX popis priloga za aktivnost
     /// </summary>
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize]
     [Route("prilozi/{activityId:int}")]
     [HttpGet]
     public IActionResult GetAttachments(int activityId)
@@ -496,16 +503,17 @@ public class ActivityController : BaseController
     /// <summary>
     /// Asinkroni upload datoteke (Dropzone)
     /// </summary>
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize]
     [Route("upload-prilog")]
     [HttpPost]
     public async Task<IActionResult> UploadAttachment(int activityId, IFormFile file)
     {
         var activity = _activityRepository.GetById(activityId);
         if (activity == null)
-        {
             return NotFound();
-        }
+
+        if (!CanEditActivity(activity))
+            return Forbid();
 
         if (file == null || file.Length == 0)
         {
@@ -553,22 +561,25 @@ public class ActivityController : BaseController
         _dbContext.Attachments.Add(attachment);
         await _dbContext.SaveChangesAsync();
 
+        _logger.LogInformation("Korisnik {UserId} uploadao prilog '{FileName}' za aktivnost {ActivityId}", CurrentUserId, file.FileName, activityId);
         return Json(new { success = true });
     }
 
     /// <summary>
     /// Brisanje priloga (AJAX)
     /// </summary>
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize]
     [Route("obrisi-prilog")]
     [HttpPost]
     public async Task<IActionResult> DeleteAttachment(int id)
     {
         var attachment = await _dbContext.Attachments.FindAsync(id);
         if (attachment == null || attachment.IsDeleted)
-        {
             return NotFound();
-        }
+
+        // Provjeri vlasništvo (korisnik može brisati samo vlastite priloge)
+        if (attachment.UserId != CurrentUserId && !User.IsInRole("Admin") && !User.IsInRole("Manager"))
+            return Forbid();
 
         var physicalPath = Path.Combine(
             _env.WebRootPath,
@@ -582,6 +593,7 @@ public class ActivityController : BaseController
         _dbContext.Attachments.Remove(attachment);
         await _dbContext.SaveChangesAsync();
 
+        _logger.LogWarning("Korisnik {UserId} obrisao prilog {AttachmentId} '{FileName}'", CurrentUserId, id, attachment.FileName);
         return Json(new { success = true });
     }
 }
