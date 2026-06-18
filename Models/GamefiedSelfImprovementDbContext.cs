@@ -32,22 +32,28 @@ public class GamefiedSelfImprovementDbContext : IdentityDbContext<AppUser>
     {
         base.OnModelCreating(modelBuilder);
 
-        // SQLite nema nvarchar(max), datetime2, bit, datetimeoffset — obriši SQL Server-specifične tipove
+        // SQLite nema nvarchar(max), datetime2, bit, datetimeoffset — eksplicitno postavi SQLite tipove
         if (Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite")
         {
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
                 foreach (var property in entityType.GetProperties())
                 {
-                    var columnType = property.GetColumnType();
-                    if (columnType != null && (
-                        columnType.Contains("nvarchar", StringComparison.OrdinalIgnoreCase) ||
-                        columnType.Equals("datetime2", StringComparison.OrdinalIgnoreCase) ||
-                        columnType.Equals("bit", StringComparison.OrdinalIgnoreCase) ||
-                        columnType.Equals("datetimeoffset", StringComparison.OrdinalIgnoreCase) ||
-                        columnType.Equals("uniqueidentifier", StringComparison.OrdinalIgnoreCase)))
+                    var clrType = Nullable.GetUnderlyingType(property.ClrType) ?? property.ClrType;
+                    if (clrType == typeof(string))
+                        property.SetColumnType("TEXT");
+                    else if (clrType == typeof(bool))
+                        property.SetColumnType("INTEGER");
+                    else if (clrType == typeof(DateTime))
+                        property.SetColumnType("TEXT");
+                    else if (clrType == typeof(DateTimeOffset))
+                        property.SetColumnType("TEXT");
+                    else
                     {
-                        property.SetColumnType(null);
+                        // JSON primitive collections (List<string>, List<int>, etc.)
+                        var existingType = property.GetColumnType();
+                        if (existingType != null && existingType.Contains("max", StringComparison.OrdinalIgnoreCase))
+                            property.SetColumnType("TEXT");
                     }
                 }
             }
