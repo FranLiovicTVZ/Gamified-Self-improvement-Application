@@ -175,10 +175,15 @@ if (!app.Environment.IsEnvironment("Testing"))
         {
             if (app.Environment.IsProduction())
             {
-                // EnsureCreated ne kreira tablice ako datoteka već postoji bez tablica
-                // (ostaci od neuspjele SQL Server migracije) — briši i kreiraj svježe
-                await db.Database.EnsureDeletedAsync();
-                await db.Database.EnsureCreatedAsync();
+                var connStr = db.Database.GetConnectionString();
+                Console.WriteLine($"[DB] ContentRootPath: {app.Environment.ContentRootPath}");
+                Console.WriteLine($"[DB] ConnectionString: {connStr}");
+                Console.WriteLine($"[DB] Calling EnsureDeletedAsync...");
+                var deleted = await db.Database.EnsureDeletedAsync();
+                Console.WriteLine($"[DB] EnsureDeletedAsync result: {deleted}");
+                Console.WriteLine($"[DB] Calling EnsureCreatedAsync...");
+                var created = await db.Database.EnsureCreatedAsync();
+                Console.WriteLine($"[DB] EnsureCreatedAsync result: {created}");
             }
             else
             {
@@ -188,7 +193,11 @@ if (!app.Environment.IsEnvironment("Testing"))
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Migration error: {ex.Message}");
+            Console.WriteLine($"[DB] ERROR type: {ex.GetType().FullName}");
+            Console.WriteLine($"[DB] ERROR message: {ex.Message}");
+            if (ex.InnerException != null)
+                Console.WriteLine($"[DB] INNER ERROR: {ex.InnerException.Message}");
+            Console.WriteLine($"[DB] Stack: {ex.StackTrace}");
         }
         
         // Seed roles and admin user
