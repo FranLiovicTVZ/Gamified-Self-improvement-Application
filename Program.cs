@@ -61,9 +61,9 @@ if (builder.Environment.IsEnvironment("Testing"))
 }
 else if (builder.Environment.IsProduction())
 {
-    var dbDir = Path.Combine(builder.Environment.ContentRootPath, "data");
-    Directory.CreateDirectory(dbDir);
-    var dbPath = Path.Combine(dbDir, "gamified.db");
+    // Na Azure App Service /home/site/wwwroot može imati probleme s permisijama za SQLite
+    // /tmp je uvijek writeable na Linux kontejnerima
+    var dbPath = "/tmp/gamified.db";
     builder.Services.AddDbContext<GamefiedSelfImprovementDbContext>(options =>
         options.UseSqlite($"Data Source={dbPath}")
             .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning)));
