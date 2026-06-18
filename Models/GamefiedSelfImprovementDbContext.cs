@@ -32,6 +32,27 @@ public class GamefiedSelfImprovementDbContext : IdentityDbContext<AppUser>
     {
         base.OnModelCreating(modelBuilder);
 
+        // SQLite nema nvarchar(max), datetime2, bit, datetimeoffset — obriši SQL Server-specifične tipove
+        if (Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite")
+        {
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties())
+                {
+                    var columnType = property.GetColumnType();
+                    if (columnType != null && (
+                        columnType.Contains("nvarchar", StringComparison.OrdinalIgnoreCase) ||
+                        columnType.Equals("datetime2", StringComparison.OrdinalIgnoreCase) ||
+                        columnType.Equals("bit", StringComparison.OrdinalIgnoreCase) ||
+                        columnType.Equals("datetimeoffset", StringComparison.OrdinalIgnoreCase) ||
+                        columnType.Equals("uniqueidentifier", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        property.SetColumnType(null);
+                    }
+                }
+            }
+        }
+
         // Inicijalni korisnici
         modelBuilder.Entity<User>().HasData(
             new User 
