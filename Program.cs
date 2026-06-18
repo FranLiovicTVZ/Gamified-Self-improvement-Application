@@ -171,14 +171,19 @@ if (!app.Environment.IsEnvironment("Testing"))
     {
         var db = scope.ServiceProvider.GetRequiredService<GamefiedSelfImprovementDbContext>();
         
-        // SQLite (Production) ne podržava SQL Server migracije — koristi EnsureCreated
-        // Development koristi MigrateAsync za SQL Server
         try
         {
             if (app.Environment.IsProduction())
+            {
+                // EnsureCreated ne kreira tablice ako datoteka već postoji bez tablica
+                // (ostaci od neuspjele SQL Server migracije) — briši i kreiraj svježe
+                await db.Database.EnsureDeletedAsync();
                 await db.Database.EnsureCreatedAsync();
+            }
             else
+            {
                 await db.Database.MigrateAsync();
+            }
             Console.WriteLine("Database schema applied successfully.");
         }
         catch (Exception ex)
