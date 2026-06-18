@@ -187,7 +187,7 @@ if (!app.Environment.IsEnvironment("Testing"))
             }
             else
             {
-                await db.Database.MigrateAsync();
+                await db.Database.EnsureCreatedAsync();
             }
             Console.WriteLine("Database schema applied successfully.");
         }
