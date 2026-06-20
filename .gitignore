@@ -1,3 +1,6 @@
+# Local dev secrets (never commit)
+appsettings.Development.json
+
 # Build results
 bin/
 obj/

@@ -23,7 +23,10 @@ public class ChatApiController : ControllerBase
     public ChatApiController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
     {
         _httpClientFactory = httpClientFactory;
-        _apiKey = configuration["Gemini:ApiKey"] ?? "";
+        _apiKey = configuration["Gemini:ApiKey"]
+               ?? Environment.GetEnvironmentVariable("Gemini__ApiKey")
+               ?? Environment.GetEnvironmentVariable("GEMINI_API_KEY")
+               ?? "";
     }
 
     [HttpPost]
