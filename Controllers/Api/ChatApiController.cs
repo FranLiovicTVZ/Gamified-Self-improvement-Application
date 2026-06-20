@@ -32,6 +32,9 @@ public class ChatApiController : ControllerBase
         if (string.IsNullOrWhiteSpace(request?.Message))
             return BadRequest(new { error = "Poruka ne može biti prazna." });
 
+        if (string.IsNullOrWhiteSpace(_apiKey))
+            return StatusCode(503, new { error = "AI asistent trenutno nije dostupan. Gemini API ključ nije konfiguriran na serveru." });
+
         var contents = new List<object>();
 
         if (request.History != null)
@@ -67,7 +70,7 @@ public class ChatApiController : ControllerBase
         var body = await response.Content.ReadAsStringAsync();
 
         if (!response.IsSuccessStatusCode)
-            return StatusCode(500, new { error = "Greška pri komunikaciji s AI-em. Pokušajte ponovno." });
+            return StatusCode(500, new { error = $"Gemini API greška ({(int)response.StatusCode}): {body}" });
 
         using var doc = JsonDocument.Parse(body);
         var text = doc.RootElement
