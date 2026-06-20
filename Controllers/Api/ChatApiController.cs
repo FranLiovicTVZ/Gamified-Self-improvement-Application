@@ -8,7 +8,7 @@ namespace GamefiedSelfImprovement.Controllers.Api;
 [Route("api/chat")]
 public class ChatApiController : ControllerBase
 {
-    private const string Endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+    private const string Endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent";
     private const string SystemPrompt =
         "Ti si AI wellness asistent specijaliziran isključivo za teme meditacije i vježbanja. " +
         "Pomažeš korisnicima savjetima o tehnikama meditacije (mindfulness, disanje, vizualizacija, body scan), " +
@@ -70,7 +70,11 @@ public class ChatApiController : ControllerBase
         var body = await response.Content.ReadAsStringAsync();
 
         if (!response.IsSuccessStatusCode)
-            return StatusCode(500, new { error = $"Gemini API greška ({(int)response.StatusCode}): {body}" });
+        {
+            if ((int)response.StatusCode == 429)
+                return StatusCode(503, new { error = "AI asistent je privremeno nedostupan zbog prekoračenja dnevne kvote. Pokušajte malo kasnije." });
+            return StatusCode(500, new { error = $"Greška pri komunikaciji s AI-em ({(int)response.StatusCode}). Pokušajte ponovno." });
+        }
 
         using var doc = JsonDocument.Parse(body);
         var text = doc.RootElement
