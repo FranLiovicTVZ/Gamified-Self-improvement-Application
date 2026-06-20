@@ -8,7 +8,8 @@ namespace GamefiedSelfImprovement.Controllers.Api;
 [Route("api/chat")]
 public class ChatApiController : ControllerBase
 {
-    private const string Endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent";
+    private const string Endpoint = "https://api.groq.com/openai/v1/chat/completions";
+    private const string Model = "llama-3.1-8b-instant";
     private const string SystemPrompt =
         "Ti si AI wellness asistent specijaliziran isključivo za teme meditacije i vježbanja. " +
         "Pomažeš korisnicima savjetima o tehnikama meditacije (mindfulness, disanje, vizualizacija, body scan), " +
@@ -23,9 +24,9 @@ public class ChatApiController : ControllerBase
     public ChatApiController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
     {
         _httpClientFactory = httpClientFactory;
-        _apiKey = configuration["Gemini:ApiKey"]
-               ?? Environment.GetEnvironmentVariable("Gemini__ApiKey")
-               ?? Environment.GetEnvironmentVariable("GEMINI_API_KEY")
+        _apiKey = configuration["Groq:ApiKey"]
+               ?? Environment.GetEnvironmentVariable("Groq__ApiKey")
+               ?? Environment.GetEnvironmentVariable("GROQ_API_KEY")
                ?? "";
     }
 
@@ -36,55 +37,54 @@ public class ChatApiController : ControllerBase
             return BadRequest(new { error = "Poruka ne može biti prazna." });
 
         if (string.IsNullOrWhiteSpace(_apiKey))
-            return StatusCode(503, new { error = "AI asistent trenutno nije dostupan. Gemini API ključ nije konfiguriran na serveru." });
+            return StatusCode(503, new { error = "AI asistent trenutno nije dostupan. API ključ nije konfiguriran na serveru." });
 
-        var contents = new List<object>();
+        var messages = new List<object>
+        {
+            new { role = "system", content = SystemPrompt }
+        };
 
         if (request.History != null)
         {
             foreach (var msg in request.History)
             {
-                contents.Add(new
-                {
-                    role = msg.Role,
-                    parts = new[] { new { text = msg.Text } }
-                });
+                // chatbot.js šalje role:"model" za asistenta — mapiramo u "assistant" za OpenAI format
+                var role = msg.Role == "model" ? "assistant" : msg.Role;
+                messages.Add(new { role, content = msg.Text });
             }
         }
 
-        contents.Add(new
-        {
-            role = "user",
-            parts = new[] { new { text = request.Message } }
-        });
+        messages.Add(new { role = "user", content = request.Message });
 
         var payload = new
         {
-            system_instruction = new { parts = new[] { new { text = SystemPrompt } } },
-            contents,
-            generationConfig = new { maxOutputTokens = 1000, temperature = 0.7 }
+            model = Model,
+            messages,
+            max_tokens = 1000,
+            temperature = 0.7
         };
 
         var client = _httpClientFactory.CreateClient();
         var json = JsonSerializer.Serialize(payload);
         var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+        client.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _apiKey);
 
-        var response = await client.PostAsync($"{Endpoint}?key={_apiKey}", httpContent);
+        var response = await client.PostAsync(Endpoint, httpContent);
         var body = await response.Content.ReadAsStringAsync();
 
         if (!response.IsSuccessStatusCode)
         {
             if ((int)response.StatusCode == 429)
-                return StatusCode(503, new { error = "AI asistent je privremeno nedostupan zbog prekoračenja dnevne kvote. Pokušajte malo kasnije." });
-            return StatusCode(500, new { error = $"Greška pri komunikaciji s AI-em ({(int)response.StatusCode}). Pokušajte ponovno." });
+                return StatusCode(503, new { error = "AI asistent je privremeno nedostupan zbog prekoračenja kvote. Pokušajte za minutu." });
+            return StatusCode(500, new { error = "Greška pri komunikaciji s AI-em. Pokušajte ponovno." });
         }
 
         using var doc = JsonDocument.Parse(body);
         var text = doc.RootElement
-            .GetProperty("candidates")[0]
+            .GetProperty("choices")[0]
+            .GetProperty("message")
             .GetProperty("content")
-            .GetProperty("parts")[0]
-            .GetProperty("text")
             .GetString() ?? "Nema odgovora.";
 
         return Ok(new { reply = text });
