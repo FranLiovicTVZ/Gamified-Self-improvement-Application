@@ -234,31 +234,4 @@ public class UserController : Controller
 
         return Json(results);
     }
-
-    /// <summary>
-    /// Briše sve Playwright test korisnike (pw_ prefix ili @playwright.test email)
-    /// URL: /korisnici/cleanup-test-users
-    /// PRIVREMENO — ukloniti nakon čišćenja baze
-    /// </summary>
-    [Route("cleanup-test-users")]
-    [HttpPost]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> CleanupTestUsers()
-    {
-        var testAppUsers = await _dbContext.Users
-            .Where(u => u.UserName!.StartsWith("pw_") || u.Email!.EndsWith("@playwright.test"))
-            .ToListAsync();
-
-        var testLegacyUsers = _userRepository.GetAll()
-            .Where(u => u.Username.StartsWith("pw_") || u.Email.EndsWith("@playwright.test"))
-            .ToList();
-
-        foreach (var u in testAppUsers)
-            await _userManager.DeleteAsync(u);
-
-        foreach (var u in testLegacyUsers)
-            _userRepository.Delete(u.Id);
-
-        return Ok(new { deleted = testAppUsers.Count, message = $"Obrisano {testAppUsers.Count} test korisnika." });
-    }
 }
