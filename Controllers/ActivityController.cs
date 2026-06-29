@@ -318,6 +318,7 @@ public class ActivityController : BaseController
         try
         {
             journal.ActivityType = ActivityType.Journal;
+            journal.Reflection ??= string.Empty;
             if (journal.XpReward == 0)
                 journal.XpReward = journal.CalculateXP();
             _activityRepository.Add(journal);

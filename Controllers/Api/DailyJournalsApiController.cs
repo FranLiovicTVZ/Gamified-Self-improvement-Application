@@ -19,7 +19,7 @@ public class DailyJournalsApiController : BaseApiController
     }
 
     [HttpGet]
-    [Authorize]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<DailyJournalDTO>>> GetAll()
     {
         try
