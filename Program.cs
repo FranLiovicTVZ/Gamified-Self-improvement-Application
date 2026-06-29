@@ -173,22 +173,7 @@ if (!app.Environment.IsEnvironment("Testing"))
         
         try
         {
-            if (app.Environment.IsProduction())
-            {
-                var connStr = db.Database.GetConnectionString();
-                Console.WriteLine($"[DB] ContentRootPath: {app.Environment.ContentRootPath}");
-                Console.WriteLine($"[DB] ConnectionString: {connStr}");
-                Console.WriteLine($"[DB] Calling EnsureDeletedAsync...");
-                var deleted = await db.Database.EnsureDeletedAsync();
-                Console.WriteLine($"[DB] EnsureDeletedAsync result: {deleted}");
-                Console.WriteLine($"[DB] Calling EnsureCreatedAsync...");
-                var created = await db.Database.EnsureCreatedAsync();
-                Console.WriteLine($"[DB] EnsureCreatedAsync result: {created}");
-            }
-            else
-            {
-                await db.Database.EnsureCreatedAsync();
-            }
+            await db.Database.EnsureCreatedAsync();
             Console.WriteLine("Database schema applied successfully.");
         }
         catch (Exception ex)
