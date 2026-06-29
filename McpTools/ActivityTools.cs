@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Text.Json;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ModelContextProtocol.Server;
 
@@ -47,6 +48,7 @@ public sealed class ActivityTools
     [McpServerTool, Description("Log a new exercise activity. Calculates XP and updates user streak automatically.")]
     public static async Task<string> LogExercise(
         GamefiedSelfImprovementDbContext db,
+        UserManager<AppUser> userManager,
         [Description("AppUser Identity string Id (get from list_users)")] string appUserId,
         [Description("Title of the exercise")] string title,
         [Description("Type: Strength, Cardio, Flexibility, or Sports")] string exerciseType,
@@ -82,6 +84,7 @@ public sealed class ActivityTools
         db.Exercises.Add(exercise);
         await db.SaveChangesAsync();
         await UpdateStreakAsync(db, appUserId);
+        await UpdateUserXpAsync(userManager, appUserId, exercise.XpReward, ActivityType.Exercise);
 
         return JsonSerializer.Serialize(new
         {
@@ -131,6 +134,7 @@ public sealed class ActivityTools
     [McpServerTool, Description("Log a new meditation session. Calculates XP and updates user streak automatically.")]
     public static async Task<string> LogMeditation(
         GamefiedSelfImprovementDbContext db,
+        UserManager<AppUser> userManager,
         [Description("AppUser Identity string Id (get from list_users)")] string appUserId,
         [Description("Title of the meditation")] string title,
         [Description("Type: Guided, Breathing, Mantras, Mindfulness, or Visualization")] string meditationType,
@@ -164,6 +168,7 @@ public sealed class ActivityTools
         db.Meditations.Add(meditation);
         await db.SaveChangesAsync();
         await UpdateStreakAsync(db, appUserId);
+        await UpdateUserXpAsync(userManager, appUserId, meditation.XpReward, ActivityType.Meditation);
 
         return JsonSerializer.Serialize(new
         {
@@ -178,6 +183,7 @@ public sealed class ActivityTools
     [McpServerTool, Description("Log a daily journal entry. Calculates XP and updates user streak automatically.")]
     public static async Task<string> LogJournal(
         GamefiedSelfImprovementDbContext db,
+        UserManager<AppUser> userManager,
         [Description("AppUser Identity string Id (get from list_users)")] string appUserId,
         [Description("Journal title")] string title,
         [Description("Mood score 1-10")] int mood,
@@ -204,6 +210,7 @@ public sealed class ActivityTools
         db.DailyJournals.Add(journal);
         await db.SaveChangesAsync();
         await UpdateStreakAsync(db, appUserId);
+        await UpdateUserXpAsync(userManager, appUserId, journal.XpReward, ActivityType.Journal);
 
         return JsonSerializer.Serialize(new
         {
@@ -218,6 +225,25 @@ public sealed class ActivityTools
     private static List<string> ParseCsv(string? csv) =>
         string.IsNullOrWhiteSpace(csv) ? [] :
         [.. csv.Split(',').Select(s => s.Trim()).Where(s => s.Length > 0)];
+
+    private static async Task UpdateUserXpAsync(UserManager<AppUser> userManager, string userId, int xpEarned, ActivityType activityType)
+    {
+        var user = await userManager.FindByIdAsync(userId);
+        if (user == null) return;
+
+        user.TotalXP += xpEarned;
+        user.Level = Math.Min(100, user.TotalXP / 100 + 1);
+        user.LastActiveDate = DateTime.UtcNow;
+
+        switch (activityType)
+        {
+            case ActivityType.Exercise:   user.ExerciseXP   += xpEarned; break;
+            case ActivityType.Meditation: user.MeditationXP += xpEarned; break;
+            case ActivityType.Journal:    user.JournalXP    += xpEarned; break;
+        }
+
+        await userManager.UpdateAsync(user);
+    }
 
     private static async Task UpdateStreakAsync(GamefiedSelfImprovementDbContext db, string userId)
     {
