@@ -135,6 +135,15 @@ public class ActivityController : BaseController
             activity.UserId = legacyUser?.Id;
             ModelState.Remove("UserId");
         }
+        else if (activity.UserId == null || activity.UserId == 0)
+        {
+            // Admin/Manager koji nije odabrao korisnika — pripiši samome sebi
+            var appUser = await UserManager.GetUserAsync(User);
+            var legacyUser = await GetCurrentLegacyUserAsync();
+            activity.AppUserId = appUser?.Id;
+            activity.UserId = legacyUser?.Id;
+            ModelState.Remove("UserId");
+        }
     }
 
     /// <summary>
@@ -296,6 +305,9 @@ public class ActivityController : BaseController
     public async Task<IActionResult> CreateJournal(DailyJournal journal)
     {
         await AssignCurrentUserIfNeededAsync(journal);
+
+        // Dnevnik nema polje DurationMinutes u formi — ukloni validacijsku grešku
+        ModelState.Remove("DurationMinutes");
 
         if (!ModelState.IsValid)
         {

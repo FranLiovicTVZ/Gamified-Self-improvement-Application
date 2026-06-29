@@ -9,6 +9,7 @@ namespace GamefiedSelfImprovement.Controllers.Api;
 /// API controller za DailyJournal sa CRUD operacijama
 /// </summary>
 [ApiController]
+[Route("api/daily-journals")]
 [Route("api/journals")]
 public class DailyJournalsApiController : BaseApiController
 {
