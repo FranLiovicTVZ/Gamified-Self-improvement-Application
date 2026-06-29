@@ -45,7 +45,7 @@ builder.Services.AddHttpClient();
 // MCP Server - exposes app data to agentic IDEs (Claude Code, Cursor, etc.)
 builder.Services
     .AddMcpServer()
-    .WithHttpTransport()
+    .WithHttpTransport(o => o.Stateless = true)
     .WithTools<GamefiedSelfImprovement.McpTools.ActivityTools>()
     .WithTools<GamefiedSelfImprovement.McpTools.UserTools>()
     .WithTools<GamefiedSelfImprovement.McpTools.StreakTools>()
